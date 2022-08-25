@@ -176,8 +176,6 @@ public class OrganizationService {
                 updateTokenCategory(orgCode, department.getCode(), "", tokenCategory);
             }
         }
-//        ApplicationMapping<DepartmentResponsePayload, Department> responseMapping = new ApplicationMapping<>();
-//        return responseMapping.convert(department, DepartmentResponsePayload.class);
     }
     public void updateTokenCategory(String orgCode, String deptCode, String tokenCatCode, TokenCategoryUpdateRequestPayload requestPayload) {
         logger.info("In updateTokenCategory()");
@@ -207,8 +205,6 @@ public class OrganizationService {
                 updateTokenType(orgCode, deptCode, tokenCategory.getCode(), "", tokenType);
             }
         }
-//        ApplicationMapping<TokenCategoryResponsePayload, TokenCategory> responseMapping = new ApplicationMapping<>();
-//        return responseMapping.convert(tokenCategory, TokenCategoryResponsePayload.class);
     }
     public void updateTokenType(String orgCode, String deptCode, String tokenCatCode, String tokenTypeCode, TokenTypeUpdateRequestPayload requestPayload) {
         logger.info("In updateTokenType()");
@@ -233,7 +229,5 @@ public class OrganizationService {
         tokenType.setName(requestPayload.getName());
         tokenType.setTokenPrefix(requestPayload.getTokenPrefix());
         tokenTypeRepository.save(tokenType);
-//        ApplicationMapping<TokenTypeResponsePayload, TokenType> responseMapping = new ApplicationMapping<>();
-//        return responseMapping.convert(tokenType, TokenTypeResponsePayload.class);
     }
 }
