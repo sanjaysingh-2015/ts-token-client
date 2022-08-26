@@ -6,6 +6,9 @@ import com.techsophy.tstokens.dto.org.OrganizationCreateRequestPayload;
 import com.techsophy.tstokens.dto.org.OrganizationResponsePayload;
 import com.techsophy.tstokens.dto.org.OrganizationUpdateRequestPayload;
 import com.techsophy.tstokens.service.OrganizationService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +21,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/organization")
+@Tag(name = "Organization", description = "The Organization APIs")
 public class OrganizationController {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final OrganizationService organizationService;
@@ -26,7 +30,7 @@ public class OrganizationController {
     public OrganizationController(OrganizationService organizationService) {
         this.organizationService = organizationService;
     }
-
+    @Operation(summary = "Creates a new Organization")
     @PostMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<IApiResponse> createOrganization(@RequestBody @Valid OrganizationCreateRequestPayload requestPayload) {
         logger.info("In createOrganization()");
@@ -34,7 +38,7 @@ public class OrganizationController {
         return ResponseEntity.ok()
                 .body(new ApiResponse(response, true, "Organization Created Successfully with Code: " + response.getCode()));
     }
-
+    @Operation(summary = "Updates an existing Organization")
     @PutMapping(value = "/{org-code}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<IApiResponse> updateOrganization(@PathVariable("org-code") String orgCode, @RequestBody @Valid OrganizationUpdateRequestPayload requestPayload) {
         logger.info("In updateOrganization()");
@@ -42,7 +46,7 @@ public class OrganizationController {
         return ResponseEntity.ok()
                 .body(new ApiResponse(response, true, "Organization Updated Successfully with Code: " + response.getCode()));
     }
-
+    @Operation(summary = "Get list of Organizations")
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<IApiResponse> getOrganizationList() {
         logger.info("In getOrganizationList()");
@@ -50,7 +54,7 @@ public class OrganizationController {
         return ResponseEntity.ok()
                 .body(new ApiResponse(response, true, "Organization Details Fetched Successfully"));
     }
-
+    @Operation(summary = "Get Details of an Organization")
     @GetMapping(value = "/{org-code}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<IApiResponse> getOrganizationDetails(@PathVariable("org-code") String orgCode) {
         logger.info("In getOrganizationDetails()");

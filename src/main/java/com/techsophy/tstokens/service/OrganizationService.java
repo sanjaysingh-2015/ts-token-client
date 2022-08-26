@@ -32,15 +32,17 @@ public class OrganizationService {
     private final TokenCategoryRepository tokenCategoryRepository;
     private final TokenTypeRepository tokenTypeRepository;
     private final ValidationUtils validationUtils;
+    private final DepartmentService departmentService;
 
     private static final String CREATED = "CREATED";
     @Autowired
-    public OrganizationService(OrganizationRepository organizationRepository, DepartmentRepository departmentRepository, TokenCategoryRepository tokenCategoryRepository, TokenTypeRepository tokenTypeRepository, ValidationUtils validationUtils) {
+    public OrganizationService(OrganizationRepository organizationRepository, DepartmentRepository departmentRepository, TokenCategoryRepository tokenCategoryRepository, TokenTypeRepository tokenTypeRepository, ValidationUtils validationUtils, DepartmentService departmentService) {
         this.organizationRepository = organizationRepository;
         this.departmentRepository = departmentRepository;
         this.tokenCategoryRepository = tokenCategoryRepository;
         this.tokenTypeRepository = tokenTypeRepository;
         this.validationUtils = validationUtils;
+        this.departmentService = departmentService;
     }
 
     public OrganizationResponsePayload getOrganizationDetails(String orgCode) {
@@ -76,53 +78,12 @@ public class OrganizationService {
         organization.setStatus(CREATED);
         if (organization.getDepartments() != null) {
             for (Department department : organization.getDepartments()) {
-                saveDepartment(organization, department);
+                departmentService.saveDepartment(organization, department);
             }
         }
         organization = organizationRepository.save(organization);
         ApplicationMapping<OrganizationResponsePayload, Organization> responseMapping = new ApplicationMapping<>();
         return responseMapping.convert(organization, OrganizationResponsePayload.class);
-    }
-    public DepartmentResponsePayload saveDepartment(Organization organization, Department department) {
-        logger.info("In saveDepartment()");
-        department.setOrganizationCode(organization.getCode());
-        department.setCreatedOn(new Date());
-        department.setStatus(CREATED);
-        departmentRepository.save(department);
-        if (department.getTokenCategories() != null) {
-            for (TokenCategory tokenCategory : department.getTokenCategories()) {
-                saveTokenCategory(organization, department, tokenCategory);
-            }
-        }
-        ApplicationMapping<DepartmentResponsePayload, Department> responseMapping = new ApplicationMapping<>();
-        return responseMapping.convert(department, DepartmentResponsePayload.class);
-    }
-    public TokenCategoryResponsePayload saveTokenCategory(Organization organization, Department department, TokenCategory tokenCategory) {
-        logger.info("In saveTokenCategory()");
-        tokenCategory.setOrganizationCode(organization.getCode());
-        tokenCategory.setDepartmentCode(department.getCode());
-        tokenCategory.setCreatedOn(new Date());
-        tokenCategory.setStatus(CREATED);
-        tokenCategoryRepository.save(tokenCategory);
-        if (tokenCategory.getTokenTypes() != null) {
-            for (TokenType tokenType : tokenCategory.getTokenTypes()) {
-                saveTokenType(organization,department,tokenCategory,tokenType);
-            }
-        }
-        ApplicationMapping<TokenCategoryResponsePayload, TokenCategory> responseMapping = new ApplicationMapping<>();
-        return responseMapping.convert(tokenCategory, TokenCategoryResponsePayload.class);
-    }
-    public TokenTypeResponsePayload saveTokenType(Organization organization, Department department, TokenCategory tokenCategory, TokenType tokenType) {
-        logger.info("In saveTokenType()");
-        tokenType.setOrganizationCode(organization.getCode());
-        tokenType.setDepartmentCode(department.getCode());
-        tokenType.setTokenCategoryCode(tokenCategory.getCode());
-        tokenType.setCreatedOn(new Date());
-        tokenType.setStatus(CREATED);
-        tokenTypeRepository.save(tokenType);
-
-        ApplicationMapping<TokenTypeResponsePayload, TokenType> responseMapping = new ApplicationMapping<>();
-        return responseMapping.convert(tokenType, TokenTypeResponsePayload.class);
     }
     public OrganizationResponsePayload updateOrganization(String orgCode, OrganizationUpdateRequestPayload requestPayload) {
         logger.info("In updateOrganization()");
@@ -142,92 +103,10 @@ public class OrganizationService {
         organizationRepository.save(organization);
         if (requestPayload.getDepartments() != null) {
             for(DepartmentUpdateRequestPayload department : requestPayload.getDepartments()) {
-                updateDepartment(orgCode, "", department);
+                departmentService.updateDepartment(orgCode, "", department);
             }
         }
         ApplicationMapping<OrganizationResponsePayload, Organization> responseMapping = new ApplicationMapping<>();
         return responseMapping.convert(organization, OrganizationResponsePayload.class);
-    }
-    public void updateDepartment(String orgCode, String deptCode, DepartmentUpdateRequestPayload requestPayload) {
-        logger.info("In updateDepartment()");
-        Optional<Department> departmentOpt;
-        if(!StringUtils.isEmpty(deptCode)) {
-            departmentOpt = departmentRepository.findByOrganizationCodeAndCode(orgCode, deptCode);
-            if(departmentOpt.isEmpty()) {
-                throw new ResourceNotFoundException("Invalid Department to update");
-            }
-        } else {
-            departmentOpt = departmentRepository.findByOrganizationCodeAndCode(orgCode, requestPayload.getCode());
-        }
-        Department department = new Department();
-        if(departmentOpt.isPresent()) {
-            department = departmentOpt.get();
-            department.setStatus(requestPayload.getStatus());
-            department.setUpdatedOn(new Date());
-        } else {
-            department.setStatus(CREATED);
-            department.setCreatedOn(new Date());
-        }
-        department.setName(requestPayload.getName());
-        department.setTokenPrefix(requestPayload.getTokenPrefix());
-        departmentRepository.save(department);
-        if (requestPayload.getTokenCategories() != null) {
-            for(TokenCategoryUpdateRequestPayload tokenCategory : requestPayload.getTokenCategories()) {
-                updateTokenCategory(orgCode, department.getCode(), "", tokenCategory);
-            }
-        }
-    }
-    public void updateTokenCategory(String orgCode, String deptCode, String tokenCatCode, TokenCategoryUpdateRequestPayload requestPayload) {
-        logger.info("In updateTokenCategory()");
-        Optional<TokenCategory> tokenCategoryOpt;
-        if(!StringUtils.isEmpty(tokenCatCode)) {
-            tokenCategoryOpt = tokenCategoryRepository.findByOrganizationCodeAndDepartmentCodeAndCode(orgCode, deptCode, tokenCatCode);
-            if(tokenCategoryOpt.isEmpty()) {
-                throw new ResourceNotFoundException("Invalid Token Category to update");
-            }
-        } else {
-            tokenCategoryOpt = tokenCategoryRepository.findByOrganizationCodeAndDepartmentCodeAndCode(orgCode, deptCode, requestPayload.getCode());
-        }
-        TokenCategory tokenCategory = new TokenCategory();
-        if(tokenCategoryOpt.isPresent()) {
-            tokenCategory = tokenCategoryOpt.get();
-            tokenCategory.setStatus(requestPayload.getStatus());
-            tokenCategory.setUpdatedOn(new Date());
-        } else {
-            tokenCategory.setStatus(CREATED);
-            tokenCategory.setCreatedOn(new Date());
-        }
-        tokenCategory.setName(requestPayload.getName());
-        tokenCategory.setTokenPrefix(requestPayload.getTokenPrefix());
-        tokenCategoryRepository.save(tokenCategory);
-        if (requestPayload.getTokenTypes() != null) {
-            for(TokenTypeUpdateRequestPayload tokenType : requestPayload.getTokenTypes()) {
-                updateTokenType(orgCode, deptCode, tokenCategory.getCode(), "", tokenType);
-            }
-        }
-    }
-    public void updateTokenType(String orgCode, String deptCode, String tokenCatCode, String tokenTypeCode, TokenTypeUpdateRequestPayload requestPayload) {
-        logger.info("In updateTokenType()");
-        Optional<TokenType> tokenTypeOpt;
-        if (!StringUtils.isEmpty(tokenCatCode)) {
-            tokenTypeOpt = tokenTypeRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCode(orgCode, deptCode, tokenCatCode, tokenTypeCode);
-            if (tokenTypeOpt.isEmpty()) {
-                throw new ResourceNotFoundException("Invalid Token Type to update");
-            }
-        } else {
-            tokenTypeOpt = tokenTypeRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCode(orgCode, deptCode, tokenCatCode, requestPayload.getCode());
-        }
-        TokenType tokenType = new TokenType();
-        if (tokenTypeOpt.isPresent()) {
-            tokenType = tokenTypeOpt.get();
-            tokenType.setStatus(requestPayload.getStatus());
-            tokenType.setUpdatedOn(new Date());
-        } else {
-            tokenType.setStatus(CREATED);
-            tokenType.setCreatedOn(new Date());
-        }
-        tokenType.setName(requestPayload.getName());
-        tokenType.setTokenPrefix(requestPayload.getTokenPrefix());
-        tokenTypeRepository.save(tokenType);
     }
 }
