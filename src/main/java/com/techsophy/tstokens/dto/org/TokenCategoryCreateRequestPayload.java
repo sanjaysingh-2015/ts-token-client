@@ -16,9 +16,6 @@ import java.util.List;
 public class TokenCategoryCreateRequestPayload {
     List<TokenTypeCreateRequestPayload> tokenTypes;
     @NotNull
-    @Size(max = 10)
-    private String code;
-    @NotNull
     @Size(max = 100)
     private String name;
     @Size(max = 10)

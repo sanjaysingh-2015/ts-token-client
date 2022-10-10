@@ -39,66 +39,64 @@ public class ValidationUtils {
         this.tokenCategoryRepository = tokenCategoryRepository;
         this.tokenTypeRepository = tokenTypeRepository;
     }
-
-    public void validateOrganization(OrganizationCreateRequestPayload requestPayload) {
-        logger.info("In validateOrganization()");
-        Map<String, String> errors = new HashMap<>();
-        //Duplicate
-        Optional<Organization> orgOpt = organizationRepository.findByCode(requestPayload.getCode());
-        if (orgOpt.isPresent()) {
-            errors.put("ORGCODE", "Organization Code already exists");
-        }
-        orgOpt = organizationRepository.findByName(requestPayload.getName());
-        if (orgOpt.isPresent()) {
-            errors.put("ORGNAME", "Organization Name already exists");
-        }
-        for (DepartmentCreateRequestPayload department : requestPayload.getDepartments()) {
-            validateDepartment(requestPayload.getCode(), department, errors);
-        }
-        if (!errors.isEmpty()) {
-            throw new InvalidDataException(new JSONObject(errors).toString());
-        }
-    }
-
-    public void validateDepartment(String orgCode, DepartmentCreateRequestPayload requestPayload, Map<String, String> errors) {
-        //Duplicate
-        Optional<Department> orgOpt = departmentRepository.findByOrganizationCodeAndCode(orgCode, requestPayload.getCode());
-        if (orgOpt.isPresent()) {
-            errors.put("DPTCODE", "Department Code already exists");
-        }
-        orgOpt = departmentRepository.findByOrganizationCodeAndName(orgCode, requestPayload.getName());
-        if (orgOpt.isPresent()) {
-            errors.put("DPTNAME", "Department Name already exists");
-        }
-        for (TokenCategoryCreateRequestPayload category : requestPayload.getTokenCategories()) {
-            validateTokenCategory(orgCode, requestPayload.getCode(), category, errors);
-        }
-    }
-
-    public void validateTokenCategory(String orgCode, String deptCode, TokenCategoryCreateRequestPayload requestPayload, Map<String, String> errors) {
-        //Duplicate
-        Optional<TokenCategory> orgOpt = tokenCategoryRepository.findByOrganizationCodeAndDepartmentCodeAndCode(orgCode, deptCode, requestPayload.getCode());
-        if (orgOpt.isPresent()) {
-            errors.put("TCTCODE", "Token Category Code already exists");
-        }
-        orgOpt = tokenCategoryRepository.findByOrganizationCodeAndDepartmentCodeAndName(orgCode, deptCode, requestPayload.getName());
-        if (orgOpt.isPresent()) {
-            errors.put("TCTNAME", "Token Category Name already exists");
-        }
-        for (TokenTypeCreateRequestPayload tokenType : requestPayload.getTokenTypes()) {
-            validateTokenType(orgCode, deptCode, requestPayload.getCode(), tokenType, errors);
-        }
-    }
-
-    public void validateTokenType(String orgCode, String deptCode, String catCode, TokenTypeCreateRequestPayload requestPayload, Map<String, String> errors) {
-        //Duplicate
-        Optional<TokenType> orgOpt = tokenTypeRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCode(orgCode, deptCode, catCode, requestPayload.getCode());
-        if (orgOpt.isPresent()) {
-            errors.put("TTYCODE", "Token Type Code already exists");
-        }
-        orgOpt = tokenTypeRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndName(orgCode, deptCode, catCode, requestPayload.getName());
-        if (orgOpt.isPresent()) {
-            errors.put("TTYNAME", "Token Type Name already exists");
-        }
-    }
+//
+//    public void validateOrganization(OrganizationCreateRequestPayload requestPayload) {
+//        logger.info("In validateOrganization()");
+//        Map<String, String> errors = new HashMap<>();
+//        //Duplicate
+//        Optional<Organization> orgOpt = organizationRepository.findByName(requestPayload.getName());
+//        if (orgOpt.isPresent()) {
+//            errors.put("ORGNAME", "Organization Name already exists");
+//        }
+//        if(requestPayload.getDepartments() != null) {
+//            for (DepartmentCreateRequestPayload department : requestPayload.getDepartments()) {
+//                validateDepartment(department, errors);
+//            }
+//            if (!errors.isEmpty()) {
+//                throw new InvalidDataException(new JSONObject(errors).toString());
+//            }
+//        }
+//    }
+//
+//    public void validateDepartment(DepartmentCreateRequestPayload requestPayload, Map<String, String> errors) {
+//        //Duplicate
+//        Optional<Department> orgOpt = departmentRepository.findByName(requestPayload.getName());
+//        if (orgOpt.isPresent()) {
+//            errors.put("DPTNAME", "Department Name already exists");
+//        }
+//        if(requestPayload.getTokenCategories() != null) {
+//            for (TokenCategoryCreateRequestPayload category : requestPayload.getTokenCategories()) {
+//                validateTokenCategory(category, errors);
+//            }
+//        }
+//    }
+//
+//    public void validateTokenCategory(TokenCategoryCreateRequestPayload requestPayload, Map<String, String> errors) {
+//        //Duplicate
+//        Optional<TokenCategory> orgOpt = tokenCategoryRepository.findByDepartmentCodeAndCode(deptCode, requestPayload.getCode());
+//        if (orgOpt.isPresent()) {
+//            errors.put("TCTCODE", "Token Category Code already exists");
+//        }
+//        orgOpt = tokenCategoryRepository.findByDepartmentCodeAndName(deptCode, requestPayload.getName());
+//        if (orgOpt.isPresent()) {
+//            errors.put("TCTNAME", "Token Category Name already exists");
+//        }
+//        if(requestPayload.getTokenTypes() != null) {
+//            for (TokenTypeCreateRequestPayload tokenType : requestPayload.getTokenTypes()) {
+//                validateTokenType(requestPayload.getCode(), tokenType, errors);
+//            }
+//        }
+//    }
+//
+//    public void validateTokenType(String catCode, TokenTypeCreateRequestPayload requestPayload, Map<String, String> errors) {
+//        //Duplicate
+//        Optional<TokenType> orgOpt = tokenTypeRepository.findByTokenCategoryCodeAndCode(catCode, requestPayload.getCode());
+//        if (orgOpt.isPresent()) {
+//            errors.put("TTYCODE", "Token Type Code already exists");
+//        }
+//        orgOpt = tokenTypeRepository.findByTokenCategoryCodeAndName(catCode, requestPayload.getName());
+//        if (orgOpt.isPresent()) {
+//            errors.put("TTYNAME", "Token Type Name already exists");
+//        }
+//    }
 }

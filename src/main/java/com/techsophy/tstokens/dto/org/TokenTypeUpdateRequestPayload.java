@@ -14,9 +14,6 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 public class TokenTypeUpdateRequestPayload {
     @NotNull
-    @Size(max = 10)
-    private String code;
-    @NotNull
     @Size(max = 100)
     private String name;
     @Size(max = 10)

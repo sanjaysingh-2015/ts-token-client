@@ -1,7 +1,5 @@
 package com.techsophy.tstokens.controller;
 
-import com.techsophy.tstokens.dto.common.ApiResponse;
-import com.techsophy.tstokens.dto.common.IApiResponse;
 import com.techsophy.tstokens.dto.org.*;
 import com.techsophy.tstokens.service.OrganizationService;
 import org.json.JSONObject;

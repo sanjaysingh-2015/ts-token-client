@@ -1,10 +1,9 @@
 package com.techsophy.tstokens.utils;
 
-import com.techsophy.tstokens.dto.org.*;
-import com.techsophy.tstokens.entity.Department;
-import com.techsophy.tstokens.entity.Organization;
-import com.techsophy.tstokens.entity.TokenCategory;
-import com.techsophy.tstokens.entity.TokenType;
+import com.techsophy.tstokens.dto.org.DepartmentCreateRequestPayload;
+import com.techsophy.tstokens.dto.org.OrganizationCreateRequestPayload;
+import com.techsophy.tstokens.dto.org.TokenCategoryCreateRequestPayload;
+import com.techsophy.tstokens.dto.org.TokenTypeCreateRequestPayload;
 import com.techsophy.tstokens.repository.DepartmentRepository;
 import com.techsophy.tstokens.repository.OrganizationRepository;
 import com.techsophy.tstokens.repository.TokenCategoryRepository;
@@ -104,7 +103,7 @@ class ValidationUtilsTest {
                 anyString(), anyString())).thenReturn(Optional.empty());
         final Map<String, String> errors = new HashMap<>();
         // Run the test
-        validationUtilsUnderTest.validateDepartment("orgCode", requestPayload, errors);
+        validationUtilsUnderTest.validateDepartment(requestPayload, errors);
 
         // Verify the results
     }
@@ -150,7 +149,7 @@ class ValidationUtilsTest {
         final Map<String, String> errors = new HashMap<>();
 
         // Run the test
-        validationUtilsUnderTest.validateTokenType("orgCode", "deptCode", "catCode", requestPayload, errors);
+        validationUtilsUnderTest.validateTokenType("catCode", requestPayload, errors);
 
         // Verify the results
     }

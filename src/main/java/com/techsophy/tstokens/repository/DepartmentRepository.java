@@ -12,4 +12,7 @@ public interface DepartmentRepository extends MongoRepository<Department, String
     List<Department> findByOrganizationCode(String orgCode);
     Optional<Department> findByOrganizationCodeAndCode(String orgCode, String code);
     Optional<Department> findByOrganizationCodeAndName(String orgCode, String name);
+    Optional<Department> findByCode(String code);
+    Optional<Department> findByName(String name);
+    Optional<Department> findByOrganizationCodeAndCodeAndStatus(String orgCode, String code, String status);
 }
