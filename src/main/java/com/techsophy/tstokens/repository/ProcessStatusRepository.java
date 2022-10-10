@@ -1,6 +1,5 @@
 package com.techsophy.tstokens.repository;
 
-import com.techsophy.tstokens.entity.ProcessStage;
 import com.techsophy.tstokens.entity.ProcessStatus;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;

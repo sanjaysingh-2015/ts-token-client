@@ -1,15 +1,10 @@
 package com.techsophy.tstokens.service;
 
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.FindOneAndUpdateOptions;
-import com.mongodb.client.model.ReturnDocument;
 import com.techsophy.tstokens.dto.api.TokenApiRequestPayload;
 import com.techsophy.tstokens.dto.api.TokenApiResponsePayload;
 import com.techsophy.tstokens.entity.*;
 import com.techsophy.tstokens.repository.*;
-import com.techsophy.tstokens.utils.ApplicationMapping;
 import org.apache.commons.lang3.StringUtils;
-import org.bson.conversions.Bson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

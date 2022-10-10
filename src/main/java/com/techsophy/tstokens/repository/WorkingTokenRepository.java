@@ -1,7 +1,5 @@
 package com.techsophy.tstokens.repository;
 
-import ch.qos.logback.core.subst.Token;
-import com.techsophy.tstokens.entity.TokenConfiguration;
 import com.techsophy.tstokens.entity.WorkingToken;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;

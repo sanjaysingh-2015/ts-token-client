@@ -9,7 +9,6 @@ import com.techsophy.tstokens.entity.Role;
 import com.techsophy.tstokens.entity.User;
 import com.techsophy.tstokens.repository.RoleRepository;
 import com.techsophy.tstokens.repository.UserRepository;
-import com.techsophy.tstokens.security.jwt.AuthCodeUtils;
 import com.techsophy.tstokens.security.jwt.JwtUtils;
 import com.techsophy.tstokens.security.services.UserDetailsImpl;
 import lombok.extern.slf4j.Slf4j;

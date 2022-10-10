@@ -1,12 +1,9 @@
 package com.techsophy.tstokens.service;
 
-import com.techsophy.tstokens.dto.org.DepartmentCreateRequestPayload;
-import com.techsophy.tstokens.dto.org.DepartmentResponsePayload;
-import com.techsophy.tstokens.dto.org.DepartmentUpdateRequestPayload;
-import com.techsophy.tstokens.dto.org.TokenCategoryUpdateRequestPayload;
-import com.techsophy.tstokens.entity.Department;
-import com.techsophy.tstokens.entity.Organization;
-import com.techsophy.tstokens.entity.TokenCategory;
+import com.techsophy.tstokens.dto.rule.ProcessStageCreateRequestPayload;
+import com.techsophy.tstokens.dto.rule.ProcessStageResponsePayload;
+import com.techsophy.tstokens.dto.rule.ProcessStageUpdateRequestPayload;
+import com.techsophy.tstokens.entity.ProcessStage;
 import com.techsophy.tstokens.exception.ResourceNotFoundException;
 import com.techsophy.tstokens.repository.DepartmentRepository;
 import com.techsophy.tstokens.repository.OrganizationRepository;
@@ -45,98 +42,117 @@ public class ProcessStageService {
         this.processStageRepository = processStageRepository;
     }
 
-    public DepartmentResponsePayload getDepartmentDetails(String orgCode, String deptCode) {
-        logger.info("In getDepartmentDetails()");
-        Optional<Department> departmentOpt = departmentRepository.findByOrganizationCodeAndCode(orgCode, deptCode);
-        DepartmentResponsePayload response = null;
-        ApplicationMapping<DepartmentResponsePayload, Department> responseMapping = new ApplicationMapping<>();
-        if(departmentOpt.isPresent()) {
-            response = responseMapping.convert(departmentOpt.get(), DepartmentResponsePayload.class);
+    public ProcessStageResponsePayload getProcessStageDetails(String orgCode, String deptCode, String catCode, String tokenTypeCode, String stageCode) {
+        logger.info("In getProcessStageDetails()");
+        Optional<ProcessStage> processStageOpt = Optional.empty();
+        if(!StringUtils.isEmpty(orgCode)) {
+            if(!StringUtils.isEmpty(deptCode)) {
+                if(!StringUtils.isEmpty(catCode)) {
+                    if(!StringUtils.isEmpty(tokenTypeCode)) {
+                        processStageOpt = processStageRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCodeAndCode(orgCode, deptCode, catCode, tokenTypeCode,stageCode);
+                    } else {
+                        processStageOpt = processStageRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCode(orgCode, deptCode, catCode,stageCode);
+                    }
+                } else {
+                    processStageOpt = processStageRepository.findByOrganizationCodeAndDepartmentCodeAndCode(orgCode, deptCode,stageCode);
+                }
+            } else {
+                processStageOpt = processStageRepository.findByOrganizationCodeAndCode(orgCode,stageCode);
+            }
+        } else {
+            processStageOpt = processStageRepository.findByCode(stageCode);
+        }
+        ProcessStageResponsePayload response = null;
+        ApplicationMapping<ProcessStageResponsePayload, ProcessStage> responseMapping = new ApplicationMapping<>();
+        if(processStageOpt.isPresent()) {
+            response = responseMapping.convert(processStageOpt.get(), ProcessStageResponsePayload.class);
         }
         return response;
     }
-    public List<DepartmentResponsePayload> getDepartmentList(String orgCode) {
-        logger.info("In getDepartmentList()");
-        List<Department> departmentList;
+    public List<ProcessStageResponsePayload> getProcessStageList(String orgCode, String deptCode, String catCode, String tokenTypeCode) {
+        logger.info("In getProcessStageDetails()");
+        List<ProcessStage> processStageList;
         if(!StringUtils.isEmpty(orgCode)) {
-            departmentList = departmentRepository.findByOrganizationCode(orgCode);
+            if(!StringUtils.isEmpty(deptCode)) {
+                if(!StringUtils.isEmpty(catCode)) {
+                    if(!StringUtils.isEmpty(tokenTypeCode)) {
+                        processStageList = processStageRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCode(orgCode, deptCode, catCode, tokenTypeCode);
+                    } else {
+                        processStageList = processStageRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCode(orgCode, deptCode, catCode);
+                    }
+                } else {
+                    processStageList = processStageRepository.findByOrganizationCodeAndDepartmentCode(orgCode, deptCode);
+                }
+            } else {
+                processStageList = processStageRepository.findByOrganizationCode(orgCode);
+            }
         } else {
-            departmentList = departmentRepository.findAll();
+            processStageList = processStageRepository.findAll();
         }
-        List<DepartmentResponsePayload> response = new ArrayList<>();
-        ApplicationMapping<DepartmentResponsePayload, Department> responseMapping = new ApplicationMapping<>();
-        departmentList.forEach(department ->
-                response.add(responseMapping.convert(department, DepartmentResponsePayload.class))
+        List<ProcessStageResponsePayload> response = new ArrayList<>();
+        ApplicationMapping<ProcessStageResponsePayload, ProcessStage> responseMapping = new ApplicationMapping<>();
+        processStageList.forEach(processStage ->
+                response.add(responseMapping.convert(processStage, ProcessStageResponsePayload.class))
         );
         return response;
     }
-    public DepartmentResponsePayload createDepartment(String orgCode, DepartmentCreateRequestPayload requestPayload) {
-        logger.info("In createOrganization()");
-        Optional<Organization> organizationOpt = organizationRepository.findByCode(orgCode);
-        if(organizationOpt.isEmpty()) {
-            throw new ResourceNotFoundException("Organization does not exists with this code");
-        }
+    public ProcessStageResponsePayload createProcessStage(ProcessStageCreateRequestPayload requestPayload) {
+        logger.info("In createProcessStage()");
+
         Map<String, String> errors = new HashMap<>();
         //validationUtils.validateDepartment(requestPayload, errors);
-        ApplicationMapping<Department, DepartmentCreateRequestPayload> mapping = new ApplicationMapping<>();
-        Department department = mapping.convert(requestPayload, Department.class);
-        department.setOrganizationCode(orgCode);
-        return saveDepartment(organizationOpt.get(), department);
+        ApplicationMapping<ProcessStage, ProcessStageCreateRequestPayload> mapping = new ApplicationMapping<>();
+        ProcessStage processStage = mapping.convert(requestPayload, ProcessStage.class);
+        return saveProcessStage(processStage);
     }
-    public DepartmentResponsePayload saveDepartment(Organization organization, Department department) {
-        logger.info("In saveDepartment()");
-        department.setOrganizationCode(organization.getCode());
-        department.setCreatedOn(new Date());
-        department.setStatus(CREATED);
-        department.setCode(SecurityUtils.generateCode(department.getName(),4));
-        departmentRepository.save(department);
-        if (department.getTokenCategories() != null) {
-            for (TokenCategory tokenCategory : department.getTokenCategories()) {
-                tokenCategoryService.saveTokenCategory(department, tokenCategory);
-            }
-        }
-        ApplicationMapping<DepartmentResponsePayload, Department> responseMapping = new ApplicationMapping<>();
-        return responseMapping.convert(department, DepartmentResponsePayload.class);
+    public ProcessStageResponsePayload saveProcessStage(ProcessStage processStage) {
+        logger.info("In saveProcessStage()");
+        processStage.setCreatedOn(new Date());
+        processStage.setStatus(CREATED);
+        processStage.setCode(SecurityUtils.generateCode(processStage.getName(),4));
+        processStageRepository.save(processStage);
+
+        ApplicationMapping<ProcessStageResponsePayload, ProcessStage> responseMapping = new ApplicationMapping<>();
+        return responseMapping.convert(processStage, ProcessStageResponsePayload.class);
     }
-    public DepartmentResponsePayload updateDepartment(String orgCode, String deptCode, DepartmentUpdateRequestPayload requestPayload) {
-        logger.info("In updateDepartment()");
-        Optional<Department> departmentOpt;
-        if(!StringUtils.isEmpty(deptCode)) {
-            departmentOpt = departmentRepository.findByOrganizationCodeAndCode(orgCode, deptCode);
-            if(departmentOpt.isEmpty()) {
-                throw new ResourceNotFoundException("Invalid Department to update");
+    public ProcessStageResponsePayload updateProcessStage(String stageCode, ProcessStageUpdateRequestPayload requestPayload) {
+        logger.info("In updateProcessStage()");
+        Optional<ProcessStage> processStageOpt = Optional.empty();
+        if(!StringUtils.isEmpty(requestPayload.getOrganizationCode())) {
+            if(!StringUtils.isEmpty(requestPayload.getDepartmentCode())) {
+                if(!StringUtils.isEmpty(requestPayload.getTokenCategoryCode())) {
+                    if(!StringUtils.isEmpty(requestPayload.getTokenTypeCode())) {
+                        processStageOpt = processStageRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCodeAndCode(requestPayload.getOrganizationCode(), requestPayload.getDepartmentCode(), requestPayload.getTokenCategoryCode(), requestPayload.getTokenTypeCode(), stageCode);
+                    } else {
+                        processStageOpt = processStageRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCode(requestPayload.getOrganizationCode(), requestPayload.getDepartmentCode(), requestPayload.getTokenCategoryCode(),stageCode);
+                    }
+                } else {
+                    processStageOpt = processStageRepository.findByOrganizationCodeAndDepartmentCodeAndCode(requestPayload.getOrganizationCode(), requestPayload.getDepartmentCode(),stageCode);
+                }
+            } else {
+                processStageOpt = processStageRepository.findByOrganizationCodeAndCode(requestPayload.getOrganizationCode(),stageCode);
             }
         } else {
-            departmentOpt = departmentRepository.findByOrganizationCodeAndCode(orgCode, deptCode);
+            processStageOpt = processStageRepository.findByCode(stageCode);
         }
-        Department department = new Department();
-        if(departmentOpt.isEmpty()) {
-            department.setStatus(CREATED);
-            department.setCreatedOn(new Date());
-        } else {
-            department = departmentOpt.get();
-            department.setStatus(requestPayload.getStatus());
-            department.setUpdatedOn(new Date());
+        ProcessStage processStage = new ProcessStage();
+        if(processStageOpt.isPresent()) {
+            processStage = processStageOpt.get();
+            processStage.setStatus(requestPayload.getStatus());
         }
-        department.setName(requestPayload.getName());
-        department.setTokenPrefix(requestPayload.getTokenPrefix());
-        departmentRepository.save(department);
-        if (requestPayload.getTokenCategories() != null) {
-            for(TokenCategoryUpdateRequestPayload tokenCategory : requestPayload.getTokenCategories()) {
-                tokenCategoryService.updateTokenCategory(orgCode, department.getCode(), tokenCategory);
-            }
-        }
-        ApplicationMapping<DepartmentResponsePayload, Department> responseMapping = new ApplicationMapping<>();
-        return responseMapping.convert(department, DepartmentResponsePayload.class);
+        processStage.setName(requestPayload.getName());
+        processStageRepository.save(processStage);
+
+        ApplicationMapping<ProcessStageResponsePayload, ProcessStage> responseMapping = new ApplicationMapping<>();
+        return responseMapping.convert(processStage, ProcessStageResponsePayload.class);
     }
-    public String deleteDepartment(String deptId) {
-        logger.info("In deleteDepartment()");
-        Department department = departmentRepository.findById(deptId).orElseThrow(
-                () -> new ResourceNotFoundException("Invalid Department to delete"));
-        department.setStatus(DELETED);
-        department.setUpdatedOn(new Date());
-        departmentRepository.save(department);
-        return "Department Deleted successfully";
+    public String deleteProcessStage(String stageId) {
+        logger.info("In deleteProcessStage()");
+        ProcessStage processStage = processStageRepository.findById(stageId).orElseThrow(
+                () -> new ResourceNotFoundException("Invalid Process Stage to delete"));
+        processStage.setStatus(DELETED);
+        processStageRepository.save(processStage);
+        return "Process Stage Deleted successfully";
     }
 
 }

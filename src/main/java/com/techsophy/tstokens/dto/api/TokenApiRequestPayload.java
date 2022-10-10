@@ -1,11 +1,6 @@
 package com.techsophy.tstokens.dto.api;
 
-import lombok.Setter;
-import lombok.Getter;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;

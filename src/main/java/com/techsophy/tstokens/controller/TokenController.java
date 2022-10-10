@@ -2,7 +2,6 @@ package com.techsophy.tstokens.controller;
 
 import com.techsophy.tstokens.dto.api.TokenApiRequestPayload;
 import com.techsophy.tstokens.dto.api.TokenApiResponsePayload;
-import com.techsophy.tstokens.dto.api.TokenInitializeApiRequestPayload;
 import com.techsophy.tstokens.dto.common.ApiResponse;
 import com.techsophy.tstokens.dto.common.IApiResponse;
 import com.techsophy.tstokens.service.WorkingTokenService;
