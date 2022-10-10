@@ -3,13 +3,11 @@ package com.techsophy.tstokens.entity;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.DocumentReference;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Date;
-import java.util.List;
 
 @Setter
 @Getter
@@ -17,8 +15,8 @@ import java.util.List;
 @NoArgsConstructor
 @ToString
 @EqualsAndHashCode
-@Document("cf_counters")
-public class Counter {
+@Document("cf_process_rule_engine")
+public class ProcessRuleEngine {
     @Id
     private String id;
     @NotNull
@@ -31,7 +29,13 @@ public class Counter {
     @Size(max = 10)
     private String tokenTypeCode;
     @NotNull
-    private String counterNo;
+    private String currentStageCode;
+    @NotNull
+    private String currentStatusCode;
+    @NotNull
+    private String nextStageCode;
+    @NotNull
+    private String nextStatusCode;
     @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private Date createdOn;
     @Size(max = 10)
