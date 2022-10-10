@@ -1,27 +1,13 @@
 package com.techsophy.tstokens.utils;
 
-import com.techsophy.tstokens.dto.org.DepartmentCreateRequestPayload;
-import com.techsophy.tstokens.dto.org.OrganizationCreateRequestPayload;
-import com.techsophy.tstokens.dto.org.TokenCategoryCreateRequestPayload;
-import com.techsophy.tstokens.dto.org.TokenTypeCreateRequestPayload;
-import com.techsophy.tstokens.entity.Department;
-import com.techsophy.tstokens.entity.Organization;
-import com.techsophy.tstokens.entity.TokenCategory;
-import com.techsophy.tstokens.entity.TokenType;
-import com.techsophy.tstokens.exception.InvalidDataException;
 import com.techsophy.tstokens.repository.DepartmentRepository;
 import com.techsophy.tstokens.repository.OrganizationRepository;
 import com.techsophy.tstokens.repository.TokenCategoryRepository;
 import com.techsophy.tstokens.repository.TokenTypeRepository;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 
 @Component
 public class ValidationUtils {

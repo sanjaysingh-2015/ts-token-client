@@ -31,15 +31,20 @@ public class WorkingToken {
     @DateTimeFormat(pattern = "dd-MM-yyyy")
     private Date workDate;
     @NotNull
-    private String tokenNo;
-    @NotNull
     private String tokenEntity;
+    @NotNull
+    private String tokenEntityValue;
+    private String counterNo;
     @NotNull
     private String userName;
     @NotNull
-    private String tokenEntityValue;
+    private String processStageCode;
+    @NotNull
+    private String processStatusCode;
     @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private Date createdOn;
     @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private Date updatedOn;
+    @NotNull
+    private String tokenNo;
 }

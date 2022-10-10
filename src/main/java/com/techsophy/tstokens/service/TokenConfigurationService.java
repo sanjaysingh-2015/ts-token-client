@@ -66,7 +66,7 @@ public class TokenConfigurationService {
             tokenConfiguration.setDepartmentCode(request.getDepartmentCode());
             tokenConfiguration.setTokenCategoryCode(request.getCategoryCode());
             tokenConfiguration.setTokenTypeCode(request.getTokenTypeCode());
-            tokenConfiguration.setCurrentTokenNo("1");
+            tokenConfiguration.setCurrentTokenNo(1);
             tokenConfiguration.setWorkDate(request.getWorkDate());
             tokenConfiguration.setCreatedOn(new Date());
             tokenConfiguration.setUserName(request.getUserName());

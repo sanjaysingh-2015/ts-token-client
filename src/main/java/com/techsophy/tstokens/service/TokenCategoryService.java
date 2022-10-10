@@ -5,7 +5,6 @@ import com.techsophy.tstokens.dto.org.TokenCategoryResponsePayload;
 import com.techsophy.tstokens.dto.org.TokenCategoryUpdateRequestPayload;
 import com.techsophy.tstokens.dto.org.TokenTypeUpdateRequestPayload;
 import com.techsophy.tstokens.entity.Department;
-import com.techsophy.tstokens.entity.Organization;
 import com.techsophy.tstokens.entity.TokenCategory;
 import com.techsophy.tstokens.entity.TokenType;
 import com.techsophy.tstokens.exception.ResourceNotFoundException;

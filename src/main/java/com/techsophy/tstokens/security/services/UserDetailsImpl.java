@@ -1,11 +1,13 @@
 package com.techsophy.tstokens.security.services;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.techsophy.tstokens.entity.Organization;
 import com.techsophy.tstokens.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -34,17 +36,28 @@ public class UserDetailsImpl implements UserDetails {
     this.authorities = authorities;
   }
 
+  public static UserDetailsImpl build(Organization organization) {
+    List<GrantedAuthority> authorities = new ArrayList<>();
+    authorities.add(new SimpleGrantedAuthority("CLIENT"));
+    return new UserDetailsImpl(
+            organization.getId(),
+            organization.getName(),
+            organization.getCountry(),
+            organization.getTokenPrefix(),
+            authorities);
+  }
+
   public static UserDetailsImpl build(User user) {
     List<GrantedAuthority> authorities = user.getRoles().stream()
-        .map(role -> new SimpleGrantedAuthority(role.getName().name()))
-        .collect(Collectors.toList());
+            .map(role -> new SimpleGrantedAuthority(role.getName().name()))
+            .collect(Collectors.toList());
 
     return new UserDetailsImpl(
-        user.getId(), 
-        user.getUsername(), 
-        user.getEmail(),
-        user.getPassword(), 
-        authorities);
+            user.getId(),
+            user.getUsername(),
+            user.getEmail(),
+            user.getPassword(),
+            authorities);
   }
 
   @Override

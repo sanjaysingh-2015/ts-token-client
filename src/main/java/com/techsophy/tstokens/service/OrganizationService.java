@@ -1,5 +1,7 @@
 package com.techsophy.tstokens.service;
 
+import com.techsophy.tstokens.dto.master.UserCreateRequestPayload;
+import com.techsophy.tstokens.dto.master.UserResponsePayload;
 import com.techsophy.tstokens.dto.org.DepartmentUpdateRequestPayload;
 import com.techsophy.tstokens.dto.org.OrganizationCreateRequestPayload;
 import com.techsophy.tstokens.dto.org.OrganizationResponsePayload;
@@ -7,16 +9,13 @@ import com.techsophy.tstokens.dto.org.OrganizationUpdateRequestPayload;
 import com.techsophy.tstokens.entity.Department;
 import com.techsophy.tstokens.entity.Organization;
 import com.techsophy.tstokens.exception.ResourceNotFoundException;
-import com.techsophy.tstokens.repository.DepartmentRepository;
 import com.techsophy.tstokens.repository.OrganizationRepository;
-import com.techsophy.tstokens.repository.TokenCategoryRepository;
-import com.techsophy.tstokens.repository.TokenTypeRepository;
 import com.techsophy.tstokens.utils.ApplicationMapping;
 import com.techsophy.tstokens.utils.SecurityUtils;
-import com.techsophy.tstokens.utils.ValidationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -29,22 +28,18 @@ public class OrganizationService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final OrganizationRepository organizationRepository;
-    private final DepartmentRepository departmentRepository;
-    private final TokenCategoryRepository tokenCategoryRepository;
-    private final TokenTypeRepository tokenTypeRepository;
-    private final ValidationUtils validationUtils;
+    private final UserConfigService userConfigService;
     private final DepartmentService departmentService;
+    private final PasswordEncoder passwordEncoder;
 
     private static final String CREATED = "ACTIVE";
     private static final String DELETED = "DELETED";
     @Autowired
-    public OrganizationService(OrganizationRepository organizationRepository, DepartmentRepository departmentRepository, TokenCategoryRepository tokenCategoryRepository, TokenTypeRepository tokenTypeRepository, ValidationUtils validationUtils, DepartmentService departmentService) {
+    public OrganizationService(OrganizationRepository organizationRepository, UserConfigService userConfigService, DepartmentService departmentService,PasswordEncoder passwordEncoder) {
         this.organizationRepository = organizationRepository;
-        this.departmentRepository = departmentRepository;
-        this.tokenCategoryRepository = tokenCategoryRepository;
-        this.tokenTypeRepository = tokenTypeRepository;
-        this.validationUtils = validationUtils;
+        this.userConfigService = userConfigService;
         this.departmentService = departmentService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public OrganizationResponsePayload getOrganizationDetails(String orgCode) {
@@ -85,8 +80,19 @@ public class OrganizationService {
             }
         }
         organization = organizationRepository.save(organization);
+        UserResponsePayload userResponsePayload = createUserForOrganization(organization);
         ApplicationMapping<OrganizationResponsePayload, Organization> responseMapping = new ApplicationMapping<>();
         return responseMapping.convert(organization, OrganizationResponsePayload.class);
+    }
+
+    private UserResponsePayload createUserForOrganization(Organization organization) {
+        UserCreateRequestPayload userRequest = new UserCreateRequestPayload();
+        userRequest.setEmail(organization.getEmail());
+        userRequest.setRole("CLIENT");
+        userRequest.setFirstName(organization.getFirstName());
+        userRequest.setLastName(organization.getLastName());
+        userRequest.setPassword(passwordEncoder.encode("ChangeIt@Now"));
+        return userConfigService.createUser(userRequest);
     }
     public OrganizationResponsePayload updateOrganization(String id, OrganizationUpdateRequestPayload requestPayload) {
         logger.info("In updateOrganization()");

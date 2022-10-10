@@ -5,8 +5,6 @@ import com.techsophy.tstokens.dto.common.IApiResponse;
 import com.techsophy.tstokens.dto.org.TokenTypeCreateRequestPayload;
 import com.techsophy.tstokens.dto.org.TokenTypeResponsePayload;
 import com.techsophy.tstokens.dto.org.TokenTypeUpdateRequestPayload;
-import com.techsophy.tstokens.entity.TokenCategory;
-import com.techsophy.tstokens.exception.ResourceNotFoundException;
 import com.techsophy.tstokens.service.TokenTypeService;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -18,7 +16,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Date;
 import java.util.List;
 
 @Slf4j

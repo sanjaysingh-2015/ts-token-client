@@ -31,7 +31,7 @@ public class TokenConfiguration {
     @DateTimeFormat(pattern = "dd-MM-yyyy")
     private Date workDate;
     @NotNull
-    private String currentTokenNo;
+    private Integer currentTokenNo;
     @NotNull
     private String status;
     @NotNull

@@ -3,11 +3,7 @@ package com.techsophy.tstokens.controller;
 import com.techsophy.tstokens.dto.api.TokenInitializeApiRequestPayload;
 import com.techsophy.tstokens.dto.common.ApiResponse;
 import com.techsophy.tstokens.dto.common.IApiResponse;
-import com.techsophy.tstokens.dto.org.TokenTypeCreateRequestPayload;
-import com.techsophy.tstokens.dto.org.TokenTypeResponsePayload;
-import com.techsophy.tstokens.dto.org.TokenTypeUpdateRequestPayload;
 import com.techsophy.tstokens.service.TokenConfigurationService;
-import com.techsophy.tstokens.service.TokenTypeService;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,13 +14,12 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @Slf4j
 @Validated
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
-@RequestMapping("/client/tokenConfig")
+@RequestMapping("/operation/tokenConfig")
 public class TokenConfigurationController {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final TokenConfigurationService tokenConfigurationService;
