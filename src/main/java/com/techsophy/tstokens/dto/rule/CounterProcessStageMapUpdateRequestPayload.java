@@ -11,7 +11,7 @@ import javax.validation.constraints.Size;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CounterUpdateRequestPayload {
+public class CounterProcessStageMapUpdateRequestPayload {
     @Size(max = 10)
     private String organizationCode;
     @Size(max = 10)
@@ -21,11 +21,9 @@ public class CounterUpdateRequestPayload {
     @Size(max = 10)
     private String tokenTypeCode;
     @Size(max =10)
-    private String code;
+    private String counterCode;
     @Size(max =10)
-    private String name;
-    @Size(max =10)
-    private String counterNo;
+    private String processStageCode;
     @Size(max =10)
     private String status;
 }

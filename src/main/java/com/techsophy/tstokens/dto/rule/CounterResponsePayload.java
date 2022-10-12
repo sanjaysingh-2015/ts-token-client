@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.Size;
+
 @Setter
 @Getter
 @AllArgsConstructor
@@ -15,6 +17,8 @@ public class CounterResponsePayload {
     private String departmentCode;
     private String tokenCategoryCode;
     private String tokenTypeCode;
+    private String code;
+    private String name;
     private String counterNo;
     private String status;
 }

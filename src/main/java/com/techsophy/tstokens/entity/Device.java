@@ -3,9 +3,11 @@ package com.techsophy.tstokens.entity;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.Date;
 
 @Setter
 @Getter
@@ -13,8 +15,8 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 @ToString
 @EqualsAndHashCode
-@Document("cf_counter_process_stage_mapping")
-public class CounterProcessMapping {
+@Document("cf_devices")
+public class Device {
     @Id
     private String id;
     @NotNull
@@ -27,19 +29,15 @@ public class CounterProcessMapping {
     @Size(max = 10)
     private String tokenTypeCode;
     @NotNull
-    private String counterId;
+    private String deviceName;
     @NotNull
-    private String processStageId;
+    private String deviceUid;
+    private String ipAddress;
+    private String port;
+    private String deviceType;
+    private String deviceLayout;
+    @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss")
+    private Date createdOn;
     @Size(max = 10)
     private String status;
-
-    public CounterProcessMapping(String organizationCode, String departmentCode, String tokenCategoryCode, String tokenTypeCode, String counterId, String processStageId, String status) {
-        this.organizationCode = organizationCode;
-        this.departmentCode = departmentCode;
-        this.tokenCategoryCode = tokenCategoryCode;
-        this.tokenTypeCode = tokenTypeCode;
-        this.counterId = counterId;
-        this.processStageId = processStageId;
-        this.status = status;
-    }
 }

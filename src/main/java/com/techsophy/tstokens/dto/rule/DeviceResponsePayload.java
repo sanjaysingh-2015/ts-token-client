@@ -11,21 +11,16 @@ import javax.validation.constraints.Size;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CounterUpdateRequestPayload {
-    @Size(max = 10)
+public class DeviceResponsePayload {
+    private String id;
     private String organizationCode;
-    @Size(max = 10)
     private String departmentCode;
-    @Size(max = 10)
     private String tokenCategoryCode;
-    @Size(max = 10)
     private String tokenTypeCode;
-    @Size(max =10)
-    private String code;
-    @Size(max =10)
-    private String name;
-    @Size(max =10)
-    private String counterNo;
-    @Size(max =10)
+    private String deviceUid;
+    private String ipAddress;
+    private String port;
+    private String deviceType;
+    private String deviceLayout;
     private String status;
 }

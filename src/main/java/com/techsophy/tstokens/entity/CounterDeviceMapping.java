@@ -13,8 +13,8 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 @ToString
 @EqualsAndHashCode
-@Document("cf_counter_process_stage_mapping")
-public class CounterProcessMapping {
+@Document("cf_counter_device_mapping")
+public class CounterDeviceMapping {
     @Id
     private String id;
     @NotNull
@@ -29,17 +29,5 @@ public class CounterProcessMapping {
     @NotNull
     private String counterId;
     @NotNull
-    private String processStageId;
-    @Size(max = 10)
-    private String status;
-
-    public CounterProcessMapping(String organizationCode, String departmentCode, String tokenCategoryCode, String tokenTypeCode, String counterId, String processStageId, String status) {
-        this.organizationCode = organizationCode;
-        this.departmentCode = departmentCode;
-        this.tokenCategoryCode = tokenCategoryCode;
-        this.tokenTypeCode = tokenTypeCode;
-        this.counterId = counterId;
-        this.processStageId = processStageId;
-        this.status = status;
-    }
+    private String deviceId;
 }

@@ -5,10 +5,7 @@ import com.techsophy.tstokens.dto.rule.ProcessStageResponsePayload;
 import com.techsophy.tstokens.dto.rule.ProcessStageUpdateRequestPayload;
 import com.techsophy.tstokens.entity.ProcessStage;
 import com.techsophy.tstokens.exception.ResourceNotFoundException;
-import com.techsophy.tstokens.repository.DepartmentRepository;
-import com.techsophy.tstokens.repository.OrganizationRepository;
-import com.techsophy.tstokens.repository.ProcessStageRepository;
-import com.techsophy.tstokens.repository.TokenTypeRepository;
+import com.techsophy.tstokens.repository.*;
 import com.techsophy.tstokens.utils.ApplicationMapping;
 import com.techsophy.tstokens.utils.SecurityUtils;
 import com.techsophy.tstokens.utils.ValidationUtils;
@@ -25,6 +22,7 @@ public class ProcessStageService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final OrganizationRepository organizationRepository;
     private final DepartmentRepository departmentRepository;
+    private final TokenCategoryRepository tokenCategoryRepository;
     private final ValidationUtils validationUtils;
     private final TokenCategoryService tokenCategoryService;
     private final TokenTypeRepository tokenTypeRepository;
@@ -33,13 +31,14 @@ public class ProcessStageService {
     private static final String DELETED = "DELETED";
 
     @Autowired
-    public ProcessStageService(OrganizationRepository organizationRepository, DepartmentRepository departmentRepository, ValidationUtils validationUtils, TokenCategoryService tokenCategoryService, TokenTypeRepository tokenTypeRepository, ProcessStageRepository processStageRepository) {
+    public ProcessStageService(OrganizationRepository organizationRepository, DepartmentRepository departmentRepository, ValidationUtils validationUtils, TokenCategoryService tokenCategoryService, TokenTypeRepository tokenTypeRepository, ProcessStageRepository processStageRepository,TokenCategoryRepository tokenCategoryRepository) {
         this.organizationRepository = organizationRepository;
         this.departmentRepository = departmentRepository;
         this.validationUtils = validationUtils;
         this.tokenCategoryService = tokenCategoryService;
         this.tokenTypeRepository = tokenTypeRepository;
         this.processStageRepository = processStageRepository;
+        this.tokenCategoryRepository = tokenCategoryRepository;
     }
 
     public ProcessStageResponsePayload getProcessStageDetails(String orgCode, String deptCode, String catCode, String tokenTypeCode, String stageCode) {
@@ -67,16 +66,18 @@ public class ProcessStageService {
         ApplicationMapping<ProcessStageResponsePayload, ProcessStage> responseMapping = new ApplicationMapping<>();
         if(processStageOpt.isPresent()) {
             response = responseMapping.convert(processStageOpt.get(), ProcessStageResponsePayload.class);
+        } else {
+            throw new ResourceNotFoundException("TS908- Invalid input, supplied data does not exists");
         }
         return response;
     }
     public List<ProcessStageResponsePayload> getProcessStageList(String orgCode, String deptCode, String catCode, String tokenTypeCode) {
         logger.info("In getProcessStageDetails()");
         List<ProcessStage> processStageList;
-        if(!StringUtils.isEmpty(orgCode)) {
-            if(!StringUtils.isEmpty(deptCode)) {
-                if(!StringUtils.isEmpty(catCode)) {
-                    if(!StringUtils.isEmpty(tokenTypeCode)) {
+        if (!StringUtils.isEmpty(orgCode)) {
+            if (!StringUtils.isEmpty(deptCode)) {
+                if (!StringUtils.isEmpty(catCode)) {
+                    if (!StringUtils.isEmpty(tokenTypeCode)) {
                         processStageList = processStageRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCode(orgCode, deptCode, catCode, tokenTypeCode);
                     } else {
                         processStageList = processStageRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCode(orgCode, deptCode, catCode);
@@ -92,9 +93,13 @@ public class ProcessStageService {
         }
         List<ProcessStageResponsePayload> response = new ArrayList<>();
         ApplicationMapping<ProcessStageResponsePayload, ProcessStage> responseMapping = new ApplicationMapping<>();
-        processStageList.forEach(processStage ->
-                response.add(responseMapping.convert(processStage, ProcessStageResponsePayload.class))
-        );
+        if (!processStageList.isEmpty()) {
+            processStageList.forEach(processStage ->
+                    response.add(responseMapping.convert(processStage, ProcessStageResponsePayload.class))
+            );
+        } else {
+            throw new ResourceNotFoundException("TS908- Invalid input, supplied data does not exists");
+        }
         return response;
     }
     public ProcessStageResponsePayload createProcessStage(ProcessStageCreateRequestPayload requestPayload) {
@@ -108,6 +113,10 @@ public class ProcessStageService {
     }
     public ProcessStageResponsePayload saveProcessStage(ProcessStage processStage) {
         logger.info("In saveProcessStage()");
+        organizationRepository.findByCodeAndStatus(processStage.getOrganizationCode(), CREATED).orElseThrow(() -> new ResourceNotFoundException("Invalid Organization Code Provided"));
+        departmentRepository.findByOrganizationCodeAndCodeAndStatus(processStage.getOrganizationCode(), processStage.getDepartmentCode(), CREATED).orElseThrow(() -> new ResourceNotFoundException("Invalid Department Code Provided"));
+        tokenCategoryRepository.findByOrganizationCodeAndDepartmentCodeAndCodeAndStatus(processStage.getOrganizationCode(), processStage.getDepartmentCode(), processStage.getTokenCategoryCode(), CREATED).orElseThrow(() -> new ResourceNotFoundException("Invalid Category Code Provided"));
+        tokenTypeRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCodeAndStatus(processStage.getOrganizationCode(), processStage.getDepartmentCode(), processStage.getTokenCategoryCode(),processStage.getTokenTypeCode(), CREATED).orElseThrow(() -> new ResourceNotFoundException("Invalid Token Type Code Provided"));
         processStage.setCreatedOn(new Date());
         processStage.setStatus(CREATED);
         processStage.setCode(SecurityUtils.generateCode(processStage.getName(),4));
@@ -140,6 +149,8 @@ public class ProcessStageService {
         if(processStageOpt.isPresent()) {
             processStage = processStageOpt.get();
             processStage.setStatus(requestPayload.getStatus());
+        } else {
+            throw new ResourceNotFoundException("TS908- Invalid input, supplied data does not exists");
         }
         processStage.setName(requestPayload.getName());
         processStageRepository.save(processStage);
@@ -155,5 +166,4 @@ public class ProcessStageService {
         processStageRepository.save(processStage);
         return "Process Stage Deleted successfully";
     }
-
 }
