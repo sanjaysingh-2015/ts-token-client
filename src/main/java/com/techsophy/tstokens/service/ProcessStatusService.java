@@ -45,32 +45,33 @@ public class ProcessStatusService {
         logger.info("In getProcessStatusDetails()");
         //TODO: Validation
         Optional<ProcessStatus> processStatusOpt = Optional.empty();
-        if(!StringUtils.isEmpty(orgCode)) {
-            if(!StringUtils.isEmpty(deptCode)) {
-                if(!StringUtils.isEmpty(catCode)) {
-                    if(!StringUtils.isEmpty(tokenTypeCode)) {
-                        processStatusOpt = processStatusRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCodeAndCode(orgCode, deptCode, catCode, tokenTypeCode,stageCode);
+        if (!StringUtils.isEmpty(orgCode)) {
+            if (!StringUtils.isEmpty(deptCode)) {
+                if (!StringUtils.isEmpty(catCode)) {
+                    if (!StringUtils.isEmpty(tokenTypeCode)) {
+                        processStatusOpt = processStatusRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCodeAndCode(orgCode, deptCode, catCode, tokenTypeCode, stageCode);
                     } else {
-                        processStatusOpt = processStatusRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCode(orgCode, deptCode, catCode,stageCode);
+                        processStatusOpt = processStatusRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCode(orgCode, deptCode, catCode, stageCode);
                     }
                 } else {
-                    processStatusOpt = processStatusRepository.findByOrganizationCodeAndDepartmentCodeAndCode(orgCode, deptCode,stageCode);
+                    processStatusOpt = processStatusRepository.findByOrganizationCodeAndDepartmentCodeAndCode(orgCode, deptCode, stageCode);
                 }
             } else {
-                processStatusOpt = processStatusRepository.findByOrganizationCodeAndCode(orgCode,stageCode);
+                processStatusOpt = processStatusRepository.findByOrganizationCodeAndCode(orgCode, stageCode);
             }
         } else {
             processStatusOpt = processStatusRepository.findByCode(stageCode);
         }
         ProcessStatusResponsePayload response = null;
         ApplicationMapping<ProcessStatusResponsePayload, ProcessStatus> responseMapping = new ApplicationMapping<>();
-        if(processStatusOpt.isPresent()) {
+        if (processStatusOpt.isPresent()) {
             response = responseMapping.convert(processStatusOpt.get(), ProcessStatusResponsePayload.class);
         } else {
             throw new ResourceNotFoundException("TS908- Invalid input, supplied data does not exists");
         }
         return response;
     }
+
     public List<ProcessStatusResponsePayload> getProcessStatusList(String orgCode, String deptCode, String catCode, String tokenTypeCode) {
         logger.info("In getProcessStatusDetails()");
         List<ProcessStatus> processStatusList;
@@ -102,6 +103,7 @@ public class ProcessStatusService {
         }
         return response;
     }
+
     public ProcessStatusResponsePayload createProcessStatus(ProcessStatusCreateRequestPayload requestPayload) {
         logger.info("In createProcessStatus()");
 
@@ -111,42 +113,44 @@ public class ProcessStatusService {
         ProcessStatus processStatus = mapping.convert(requestPayload, ProcessStatus.class);
         return saveProcessStatus(processStatus);
     }
+
     public ProcessStatusResponsePayload saveProcessStatus(ProcessStatus processStatus) {
         logger.info("In saveProcessStatus()");
         organizationRepository.findByCodeAndStatus(processStatus.getOrganizationCode(), CREATED).orElseThrow(() -> new ResourceNotFoundException("Invalid Organization Code Provided"));
         departmentRepository.findByOrganizationCodeAndCodeAndStatus(processStatus.getOrganizationCode(), processStatus.getDepartmentCode(), CREATED).orElseThrow(() -> new ResourceNotFoundException("Invalid Department Code Provided"));
         tokenCategoryRepository.findByOrganizationCodeAndDepartmentCodeAndCodeAndStatus(processStatus.getOrganizationCode(), processStatus.getDepartmentCode(), processStatus.getTokenCategoryCode(), CREATED).orElseThrow(() -> new ResourceNotFoundException("Invalid Category Code Provided"));
-        tokenTypeRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCodeAndStatus(processStatus.getOrganizationCode(), processStatus.getDepartmentCode(), processStatus.getTokenCategoryCode(),processStatus.getTokenTypeCode(), CREATED).orElseThrow(() -> new ResourceNotFoundException("Invalid Token Type Code Provided"));
+        tokenTypeRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCodeAndStatus(processStatus.getOrganizationCode(), processStatus.getDepartmentCode(), processStatus.getTokenCategoryCode(), processStatus.getTokenTypeCode(), CREATED).orElseThrow(() -> new ResourceNotFoundException("Invalid Token Type Code Provided"));
         processStatus.setCreatedOn(new Date());
         processStatus.setStatus(CREATED);
-        processStatus.setCode(SecurityUtils.generateCode(processStatus.getName(),4));
+        processStatus.setCode(SecurityUtils.generateCode(processStatus.getName(), 4));
         processStatusRepository.save(processStatus);
 
         ApplicationMapping<ProcessStatusResponsePayload, ProcessStatus> responseMapping = new ApplicationMapping<>();
         return responseMapping.convert(processStatus, ProcessStatusResponsePayload.class);
     }
+
     public ProcessStatusResponsePayload updateProcessStatus(String stageCode, ProcessStatusUpdateRequestPayload requestPayload) {
         logger.info("In updateProcessStatus()");
         Optional<ProcessStatus> processStatusOpt = Optional.empty();
-        if(!StringUtils.isEmpty(requestPayload.getOrganizationCode())) {
-            if(!StringUtils.isEmpty(requestPayload.getDepartmentCode())) {
-                if(!StringUtils.isEmpty(requestPayload.getTokenCategoryCode())) {
-                    if(!StringUtils.isEmpty(requestPayload.getTokenTypeCode())) {
+        if (!StringUtils.isEmpty(requestPayload.getOrganizationCode())) {
+            if (!StringUtils.isEmpty(requestPayload.getDepartmentCode())) {
+                if (!StringUtils.isEmpty(requestPayload.getTokenCategoryCode())) {
+                    if (!StringUtils.isEmpty(requestPayload.getTokenTypeCode())) {
                         processStatusOpt = processStatusRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCodeAndCode(requestPayload.getOrganizationCode(), requestPayload.getDepartmentCode(), requestPayload.getTokenCategoryCode(), requestPayload.getTokenTypeCode(), stageCode);
                     } else {
-                        processStatusOpt = processStatusRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCode(requestPayload.getOrganizationCode(), requestPayload.getDepartmentCode(), requestPayload.getTokenCategoryCode(),stageCode);
+                        processStatusOpt = processStatusRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCode(requestPayload.getOrganizationCode(), requestPayload.getDepartmentCode(), requestPayload.getTokenCategoryCode(), stageCode);
                     }
                 } else {
-                    processStatusOpt = processStatusRepository.findByOrganizationCodeAndDepartmentCodeAndCode(requestPayload.getOrganizationCode(), requestPayload.getDepartmentCode(),stageCode);
+                    processStatusOpt = processStatusRepository.findByOrganizationCodeAndDepartmentCodeAndCode(requestPayload.getOrganizationCode(), requestPayload.getDepartmentCode(), stageCode);
                 }
             } else {
-                processStatusOpt = processStatusRepository.findByOrganizationCodeAndCode(requestPayload.getOrganizationCode(),stageCode);
+                processStatusOpt = processStatusRepository.findByOrganizationCodeAndCode(requestPayload.getOrganizationCode(), stageCode);
             }
         } else {
             processStatusOpt = processStatusRepository.findByCode(stageCode);
         }
         ProcessStatus processStatus = new ProcessStatus();
-        if(processStatusOpt.isPresent()) {
+        if (processStatusOpt.isPresent()) {
             processStatus = processStatusOpt.get();
             processStatus.setStatus(requestPayload.getStatus());
         } else {
@@ -158,6 +162,7 @@ public class ProcessStatusService {
         ApplicationMapping<ProcessStatusResponsePayload, ProcessStatus> responseMapping = new ApplicationMapping<>();
         return responseMapping.convert(processStatus, ProcessStatusResponsePayload.class);
     }
+
     public String deleteProcessStatus(String stageId) {
         logger.info("In deleteProcessStatus()");
         ProcessStatus processStatus = processStatusRepository.findById(stageId).orElseThrow(

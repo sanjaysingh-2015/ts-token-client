@@ -20,12 +20,12 @@ public class ProcessRuleEngineCreateRequestPayload {
     private String tokenCategoryCode;
     @Size(max = 10)
     private String tokenTypeCode;
-    @Size(max =10)
+    @Size(max = 10)
     private String currentStageCode;
-    @Size(max =10)
+    @Size(max = 10)
     private String currentStatusCode;
-    @Size(max =10)
+    @Size(max = 10)
     private String nextStageCode;
-    @Size(max =10)
+    @Size(max = 10)
     private String nextStatusCode;
 }

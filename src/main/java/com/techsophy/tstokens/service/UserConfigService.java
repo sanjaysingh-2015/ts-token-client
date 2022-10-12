@@ -32,7 +32,7 @@ public class UserConfigService {
         Optional<User> userOpt = userRepository.findByEmail(email);
         UserResponsePayload response = null;
         ApplicationMapping<UserResponsePayload, User> responseMapping = new ApplicationMapping<>();
-        if(userOpt.isPresent()) {
+        if (userOpt.isPresent()) {
             response = responseMapping.convert(userOpt.get(), UserResponsePayload.class);
         }
         return response;
@@ -57,6 +57,7 @@ public class UserConfigService {
         User user = mapping.convert(requestPayload, User.class);
         return saveUser(user);
     }
+
     public UserResponsePayload saveUser(User user) {
         logger.info("In saveUser()");
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -64,9 +65,10 @@ public class UserConfigService {
         ApplicationMapping<UserResponsePayload, User> responseMapping = new ApplicationMapping<>();
         return responseMapping.convert(user, UserResponsePayload.class);
     }
+
     public UserResponsePayload updateUser(String email, UserCreateRequestPayload requestPayload) {
         logger.info("In updateUser()");
-        Optional<User> userOpt= userRepository.findByEmail(email);
+        Optional<User> userOpt = userRepository.findByEmail(email);
         if (userOpt.isEmpty()) {
             throw new ResourceNotFoundException("Invalid User to update");
         }

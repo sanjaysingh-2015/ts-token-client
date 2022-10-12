@@ -20,12 +20,12 @@ public class DeviceUpdateRequestPayload {
     private String tokenCategoryCode;
     @Size(max = 10)
     private String tokenTypeCode;
-    @Size(max =10)
+    @Size(max = 10)
     private String deviceUid;
     private String ipAddress;
     private String port;
     private String deviceType;
     private String deviceLayout;
-    @Size(max =10)
+    @Size(max = 10)
     private String status;
 }

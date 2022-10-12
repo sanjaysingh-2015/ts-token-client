@@ -33,15 +33,15 @@ public class TokenCategoryController {
     }
 
     @PostMapping(value = "/{dept-code}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<IApiResponse> createTokenCategory(@PathVariable("dept-code") String deptCode,@RequestBody @Valid TokenCategoryCreateRequestPayload requestPayload) {
+    public ResponseEntity<IApiResponse> createTokenCategory(@PathVariable("dept-code") String deptCode, @RequestBody @Valid TokenCategoryCreateRequestPayload requestPayload) {
         logger.info("In createOrganization()");
-        TokenCategoryResponsePayload response = tokenCategoryService.createTokenCategory(deptCode,requestPayload);
+        TokenCategoryResponsePayload response = tokenCategoryService.createTokenCategory(deptCode, requestPayload);
         return ResponseEntity.ok()
                 .body(new ApiResponse(response, true, "Token Category Created Successfully with Code: " + response.getCode()));
     }
 
     @PutMapping(value = "/{dept-code}/{token-cat-code}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<IApiResponse> updateTokenCategory( @PathVariable("dept-code") String deptCode, @PathVariable("token-cat-code") String tokenCatCode, @RequestBody @Valid TokenCategoryUpdateRequestPayload requestPayload) {
+    public ResponseEntity<IApiResponse> updateTokenCategory(@PathVariable("dept-code") String deptCode, @PathVariable("token-cat-code") String tokenCatCode, @RequestBody @Valid TokenCategoryUpdateRequestPayload requestPayload) {
         logger.info("In updateOrganization()");
         TokenCategoryResponsePayload response = tokenCategoryService.updateTokenCategory(deptCode, tokenCatCode, requestPayload);
         return ResponseEntity.ok()
@@ -57,7 +57,7 @@ public class TokenCategoryController {
     }
 
     @GetMapping(value = "/{dept-code}/{token-cat-code}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<IApiResponse> getTokenCategoryDetails( @PathVariable("dept-code") String deptCode, @PathVariable("token-cat-code") String tokenCateCode) {
+    public ResponseEntity<IApiResponse> getTokenCategoryDetails(@PathVariable("dept-code") String deptCode, @PathVariable("token-cat-code") String tokenCateCode) {
         logger.info("In getOrganizationDetails()");
         TokenCategoryResponsePayload response = tokenCategoryService.getTokenCategoryDetails(deptCode, tokenCateCode);
         return ResponseEntity.ok()

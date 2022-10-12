@@ -31,8 +31,9 @@ public class DepartmentService {
 
     private static final String CREATED = "ACTIVE";
     private static final String DELETED = "DELETED";
+
     @Autowired
-    public DepartmentService(OrganizationRepository organizationRepository, DepartmentRepository departmentRepository, ValidationUtils validationUtils,TokenCategoryService tokenCategoryService) {
+    public DepartmentService(OrganizationRepository organizationRepository, DepartmentRepository departmentRepository, ValidationUtils validationUtils, TokenCategoryService tokenCategoryService) {
         this.organizationRepository = organizationRepository;
         this.departmentRepository = departmentRepository;
         this.validationUtils = validationUtils;
@@ -44,15 +45,16 @@ public class DepartmentService {
         Optional<Department> departmentOpt = departmentRepository.findByOrganizationCodeAndCode(orgCode, deptCode);
         DepartmentResponsePayload response = null;
         ApplicationMapping<DepartmentResponsePayload, Department> responseMapping = new ApplicationMapping<>();
-        if(departmentOpt.isPresent()) {
+        if (departmentOpt.isPresent()) {
             response = responseMapping.convert(departmentOpt.get(), DepartmentResponsePayload.class);
         }
         return response;
     }
+
     public List<DepartmentResponsePayload> getDepartmentList(String orgCode) {
         logger.info("In getDepartmentList()");
         List<Department> departmentList;
-        if(!StringUtils.isEmpty(orgCode)) {
+        if (!StringUtils.isEmpty(orgCode)) {
             departmentList = departmentRepository.findByOrganizationCode(orgCode);
         } else {
             departmentList = departmentRepository.findAll();
@@ -64,10 +66,11 @@ public class DepartmentService {
         );
         return response;
     }
+
     public DepartmentResponsePayload createDepartment(String orgCode, DepartmentCreateRequestPayload requestPayload) {
         logger.info("In createOrganization()");
         Optional<Organization> organizationOpt = organizationRepository.findByCode(orgCode);
-        if(organizationOpt.isEmpty()) {
+        if (organizationOpt.isEmpty()) {
             throw new ResourceNotFoundException("Organization does not exists with this code");
         }
         Map<String, String> errors = new HashMap<>();
@@ -77,12 +80,13 @@ public class DepartmentService {
         department.setOrganizationCode(orgCode);
         return saveDepartment(organizationOpt.get(), department);
     }
+
     public DepartmentResponsePayload saveDepartment(Organization organization, Department department) {
         logger.info("In saveDepartment()");
         department.setOrganizationCode(organization.getCode());
         department.setCreatedOn(new Date());
         department.setStatus(CREATED);
-        department.setCode(SecurityUtils.generateCode(department.getName(),4));
+        department.setCode(SecurityUtils.generateCode(department.getName(), 4));
         departmentRepository.save(department);
         if (department.getTokenCategories() != null) {
             for (TokenCategory tokenCategory : department.getTokenCategories()) {
@@ -92,19 +96,20 @@ public class DepartmentService {
         ApplicationMapping<DepartmentResponsePayload, Department> responseMapping = new ApplicationMapping<>();
         return responseMapping.convert(department, DepartmentResponsePayload.class);
     }
+
     public DepartmentResponsePayload updateDepartment(String orgCode, String deptCode, DepartmentUpdateRequestPayload requestPayload) {
         logger.info("In updateDepartment()");
         Optional<Department> departmentOpt;
-        if(!StringUtils.isEmpty(deptCode)) {
+        if (!StringUtils.isEmpty(deptCode)) {
             departmentOpt = departmentRepository.findByOrganizationCodeAndCode(orgCode, deptCode);
-            if(departmentOpt.isEmpty()) {
+            if (departmentOpt.isEmpty()) {
                 throw new ResourceNotFoundException("Invalid Department to update");
             }
         } else {
             departmentOpt = departmentRepository.findByOrganizationCodeAndCode(orgCode, deptCode);
         }
         Department department = new Department();
-        if(departmentOpt.isEmpty()) {
+        if (departmentOpt.isEmpty()) {
             department.setStatus(CREATED);
             department.setCreatedOn(new Date());
         } else {
@@ -116,13 +121,14 @@ public class DepartmentService {
         department.setTokenPrefix(requestPayload.getTokenPrefix());
         departmentRepository.save(department);
         if (requestPayload.getTokenCategories() != null) {
-            for(TokenCategoryUpdateRequestPayload tokenCategory : requestPayload.getTokenCategories()) {
+            for (TokenCategoryUpdateRequestPayload tokenCategory : requestPayload.getTokenCategories()) {
                 tokenCategoryService.updateTokenCategory(orgCode, department.getCode(), tokenCategory);
             }
         }
         ApplicationMapping<DepartmentResponsePayload, Department> responseMapping = new ApplicationMapping<>();
         return responseMapping.convert(department, DepartmentResponsePayload.class);
     }
+
     public String deleteDepartment(String deptId) {
         logger.info("In deleteDepartment()");
         Department department = departmentRepository.findById(deptId).orElseThrow(

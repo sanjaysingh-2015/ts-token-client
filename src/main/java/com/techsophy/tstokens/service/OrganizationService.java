@@ -34,8 +34,9 @@ public class OrganizationService {
 
     private static final String CREATED = "ACTIVE";
     private static final String DELETED = "DELETED";
+
     @Autowired
-    public OrganizationService(OrganizationRepository organizationRepository, UserConfigService userConfigService, DepartmentService departmentService,PasswordEncoder passwordEncoder) {
+    public OrganizationService(OrganizationRepository organizationRepository, UserConfigService userConfigService, DepartmentService departmentService, PasswordEncoder passwordEncoder) {
         this.organizationRepository = organizationRepository;
         this.userConfigService = userConfigService;
         this.departmentService = departmentService;
@@ -47,27 +48,30 @@ public class OrganizationService {
         Optional<Organization> organizationOpt = organizationRepository.findByCode(orgCode);
         OrganizationResponsePayload response = null;
         ApplicationMapping<OrganizationResponsePayload, Organization> responseMapping = new ApplicationMapping<>();
-        if(organizationOpt.isPresent()) {
+        if (organizationOpt.isPresent()) {
             response = responseMapping.convert(organizationOpt.get(), OrganizationResponsePayload.class);
         }
         return response;
     }
+
     public List<OrganizationResponsePayload> getOrganizationList() {
         logger.info("In getOrganizationList()");
         List<Organization> organizationList = organizationRepository.findAll();
         List<OrganizationResponsePayload> response = new ArrayList<>();
         ApplicationMapping<OrganizationResponsePayload, Organization> responseMapping = new ApplicationMapping<>();
         organizationList.forEach(organization ->
-            response.add(responseMapping.convert(organization, OrganizationResponsePayload.class))
+                response.add(responseMapping.convert(organization, OrganizationResponsePayload.class))
         );
         return response;
     }
+
     public OrganizationResponsePayload createOrganization(OrganizationCreateRequestPayload requestPayload) {
         logger.info("In createOrganization()");
         ApplicationMapping<Organization, OrganizationCreateRequestPayload> mapping = new ApplicationMapping<>();
         Organization organization = mapping.convert(requestPayload, Organization.class);
         return saveOrganization(organization);
     }
+
     public OrganizationResponsePayload saveOrganization(Organization organization) {
         logger.info("In saveOrganization()");
         organization.setCreatedOn(new Date());
@@ -94,6 +98,7 @@ public class OrganizationService {
         userRequest.setPassword(passwordEncoder.encode("ChangeIt@Now"));
         return userConfigService.createUser(userRequest);
     }
+
     public OrganizationResponsePayload updateOrganization(String id, OrganizationUpdateRequestPayload requestPayload) {
         logger.info("In updateOrganization()");
         Optional<Organization> organizationOpt = organizationRepository.findById(id);
@@ -116,7 +121,7 @@ public class OrganizationService {
         organization.setUpdatedOn(new Date());
         organizationRepository.save(organization);
         if (requestPayload.getDepartments() != null) {
-            for(DepartmentUpdateRequestPayload department : requestPayload.getDepartments()) {
+            for (DepartmentUpdateRequestPayload department : requestPayload.getDepartments()) {
                 departmentService.updateDepartment(organization.getCode(), "", department);
             }
         }

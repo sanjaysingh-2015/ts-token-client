@@ -24,12 +24,12 @@ public class OrganizationUpdateRequestPayload {
     @NotNull
     private String phoneNo;
     @NotNull
-    @Size(max=50)
+    @Size(max = 50)
     private String firstName;
-    @Size(max=50)
+    @Size(max = 50)
     private String middleName;
     @NotNull
-    @Size(max=50)
+    @Size(max = 50)
     private String lastName;
     @Size(max = 255)
     private String address;

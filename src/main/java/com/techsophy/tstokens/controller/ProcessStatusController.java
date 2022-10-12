@@ -41,31 +41,31 @@ public class ProcessStatusController {
     }
 
     @PutMapping(value = "/{status-code}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<IApiResponse> updateProcessStatus(@PathVariable("status-code") String statusCode,@RequestBody @Valid ProcessStatusUpdateRequestPayload requestPayload) {
+    public ResponseEntity<IApiResponse> updateProcessStatus(@PathVariable("status-code") String statusCode, @RequestBody @Valid ProcessStatusUpdateRequestPayload requestPayload) {
         logger.info("In updateProcessStatus()");
         ProcessStatusResponsePayload response = processStatusService.updateProcessStatus(statusCode, requestPayload);
         return ResponseEntity.ok()
                 .body(new ApiResponse(response, true, "Process Status Updated Successfully with Code: " + response.getCode()));
     }
 
-    @GetMapping(value ={"", ""}, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = {"", ""}, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<IApiResponse> getProcessStatusList(
             @RequestParam(name = "org-code", required = false) String orgCode,
             @RequestParam(name = "dept-code", required = false) String deptCode,
             @RequestParam(name = "cat-code", required = false) String catCode,
             @RequestParam(name = "token_type-code", required = false) String tokenTypeCode) {
         logger.info("In getDepartmentList()");
-        List<ProcessStatusResponsePayload> response = processStatusService.getProcessStatusList(orgCode, deptCode, catCode,tokenTypeCode);
+        List<ProcessStatusResponsePayload> response = processStatusService.getProcessStatusList(orgCode, deptCode, catCode, tokenTypeCode);
         return ResponseEntity.ok()
                 .body(new ApiResponse(response, true, "Process Status Details Fetched Successfully"));
     }
 
     @GetMapping(value = "/{status-code}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<IApiResponse> getProcessStatusDetails(@PathVariable(name="status-code") String statusCode,
-                                                               @RequestParam(name = "org-code", required = false) String orgCode,
-                                                               @RequestParam(name = "dept-code", required = false) String deptCode,
-                                                               @RequestParam(name = "cat-code", required = false) String catCode,
-                                                               @RequestParam(name = "token_type-code", required = false) String tokenTypeCode) {
+    public ResponseEntity<IApiResponse> getProcessStatusDetails(@PathVariable(name = "status-code") String statusCode,
+                                                                @RequestParam(name = "org-code", required = false) String orgCode,
+                                                                @RequestParam(name = "dept-code", required = false) String deptCode,
+                                                                @RequestParam(name = "cat-code", required = false) String catCode,
+                                                                @RequestParam(name = "token_type-code", required = false) String tokenTypeCode) {
         logger.info("In getProcessStatusDetails()");
         ProcessStatusResponsePayload response = processStatusService.getProcessStatusDetails(orgCode, deptCode, catCode, tokenTypeCode, statusCode);
         return ResponseEntity.ok()

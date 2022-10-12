@@ -41,31 +41,31 @@ public class DeviceController {
     }
 
     @PutMapping(value = "/{device-code}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<IApiResponse> updateDevice(@PathVariable("device-code") String deviceCode,@RequestBody @Valid DeviceUpdateRequestPayload requestPayload) {
+    public ResponseEntity<IApiResponse> updateDevice(@PathVariable("device-code") String deviceCode, @RequestBody @Valid DeviceUpdateRequestPayload requestPayload) {
         logger.info("In updateDevice()");
         DeviceResponsePayload response = deviceService.updateDevice(deviceCode, requestPayload);
         return ResponseEntity.ok()
                 .body(new ApiResponse(response, true, "Process Stage Updated Successfully with Code: " + response.getDeviceUid()));
     }
 
-    @GetMapping(value ={"", ""}, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = {"", ""}, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<IApiResponse> getDeviceList(
             @RequestParam(name = "org-code", required = false) String orgCode,
             @RequestParam(name = "dept-code", required = false) String deptCode,
             @RequestParam(name = "cat-code", required = false) String catCode,
             @RequestParam(name = "token_type-code", required = false) String tokenTypeCode) {
         logger.info("In getDepartmentList()");
-        List<DeviceResponsePayload> response = deviceService.getDeviceList(orgCode, deptCode, catCode,tokenTypeCode);
+        List<DeviceResponsePayload> response = deviceService.getDeviceList(orgCode, deptCode, catCode, tokenTypeCode);
         return ResponseEntity.ok()
                 .body(new ApiResponse(response, true, "Process Stage Details Fetched Successfully"));
     }
 
     @GetMapping(value = "/{device-code}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<IApiResponse> getDeviceDetails(@PathVariable(name="device-code") String deviceCode,
-                                                               @RequestParam(name = "org-code", required = false) String orgCode,
-                                                               @RequestParam(name = "dept-code", required = false) String deptCode,
-                                                               @RequestParam(name = "cat-code", required = false) String catCode,
-                                                               @RequestParam(name = "token_type-code", required = false) String tokenTypeCode) {
+    public ResponseEntity<IApiResponse> getDeviceDetails(@PathVariable(name = "device-code") String deviceCode,
+                                                         @RequestParam(name = "org-code", required = false) String orgCode,
+                                                         @RequestParam(name = "dept-code", required = false) String deptCode,
+                                                         @RequestParam(name = "cat-code", required = false) String catCode,
+                                                         @RequestParam(name = "token_type-code", required = false) String tokenTypeCode) {
         logger.info("In getDeviceDetails()");
         DeviceResponsePayload response = deviceService.getDeviceDetails(orgCode, deptCode, catCode, tokenTypeCode, deviceCode);
         return ResponseEntity.ok()

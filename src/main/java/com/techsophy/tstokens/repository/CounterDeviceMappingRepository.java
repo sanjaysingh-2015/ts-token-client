@@ -9,5 +9,6 @@ import java.util.List;
 @Repository
 public interface CounterDeviceMappingRepository extends MongoRepository<CounterDeviceMapping, String> {
     List<CounterDeviceMapping> findByCounterId(String counterId);
+
     List<CounterDeviceMapping> findByDeviceId(String deviceId);
 }

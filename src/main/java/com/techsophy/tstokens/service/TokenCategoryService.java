@@ -51,7 +51,7 @@ public class TokenCategoryService {
         Optional<TokenCategory> tokenCategoryOpt = tokenCategoryRepository.findByDepartmentCodeAndCode(deptCode, tokenCatCode);
         TokenCategoryResponsePayload response = null;
         ApplicationMapping<TokenCategoryResponsePayload, TokenCategory> responseMapping = new ApplicationMapping<>();
-        if(tokenCategoryOpt.isPresent()) {
+        if (tokenCategoryOpt.isPresent()) {
             response = responseMapping.convert(tokenCategoryOpt.get(), TokenCategoryResponsePayload.class);
         }
         return response;
@@ -71,7 +71,7 @@ public class TokenCategoryService {
     public TokenCategoryResponsePayload createTokenCategory(String deptCode, TokenCategoryCreateRequestPayload requestPayload) {
         logger.info("In createOrganization()");
         Optional<Department> departmentOpt = departmentRepository.findByCode(deptCode);
-        if(departmentOpt.isEmpty()) {
+        if (departmentOpt.isEmpty()) {
             throw new ResourceNotFoundException("Department does not exists with this code");
         }
         Map<String, String> errors = new HashMap<>();
@@ -80,6 +80,7 @@ public class TokenCategoryService {
         TokenCategory tokenCategory = mapping.convert(requestPayload, TokenCategory.class);
         return saveTokenCategory(departmentOpt.get(), tokenCategory);
     }
+
     public TokenCategoryResponsePayload saveTokenCategory(Department department, TokenCategory tokenCategory) {
         logger.info("In saveTokenCategory()");
         tokenCategory.setOrganizationCode(department.getOrganizationCode());
@@ -90,25 +91,26 @@ public class TokenCategoryService {
         tokenCategoryRepository.save(tokenCategory);
         if (tokenCategory.getTokenTypes() != null) {
             for (TokenType tokenType : tokenCategory.getTokenTypes()) {
-                tokenTypeService.saveTokenType(tokenCategory,tokenType);
+                tokenTypeService.saveTokenType(tokenCategory, tokenType);
             }
         }
         ApplicationMapping<TokenCategoryResponsePayload, TokenCategory> responseMapping = new ApplicationMapping<>();
         return responseMapping.convert(tokenCategory, TokenCategoryResponsePayload.class);
     }
+
     public TokenCategoryResponsePayload updateTokenCategory(String deptCode, String tokenCatCode, TokenCategoryUpdateRequestPayload requestPayload) {
         logger.info("In updateTokenCategory()");
         Optional<TokenCategory> tokenCategoryOpt;
-        if(!StringUtils.isEmpty(tokenCatCode)) {
+        if (!StringUtils.isEmpty(tokenCatCode)) {
             tokenCategoryOpt = tokenCategoryRepository.findByDepartmentCodeAndCode(deptCode, tokenCatCode);
-            if(tokenCategoryOpt.isEmpty()) {
+            if (tokenCategoryOpt.isEmpty()) {
                 throw new ResourceNotFoundException("Invalid Token Category to update");
             }
         } else {
             tokenCategoryOpt = tokenCategoryRepository.findByDepartmentCodeAndCode(deptCode, tokenCatCode);
         }
         TokenCategory tokenCategory = new TokenCategory();
-        if(tokenCategoryOpt.isPresent()) {
+        if (tokenCategoryOpt.isPresent()) {
             tokenCategory = tokenCategoryOpt.get();
             tokenCategory.setStatus(requestPayload.getStatus());
             tokenCategory.setUpdatedOn(new Date());
@@ -120,7 +122,7 @@ public class TokenCategoryService {
         tokenCategory.setTokenPrefix(requestPayload.getTokenPrefix());
         tokenCategoryRepository.save(tokenCategory);
         if (requestPayload.getTokenTypes() != null) {
-            for(TokenTypeUpdateRequestPayload tokenType : requestPayload.getTokenTypes()) {
+            for (TokenTypeUpdateRequestPayload tokenType : requestPayload.getTokenTypes()) {
                 tokenTypeService.updateTokenType(deptCode, tokenCategory.getCode(), tokenType);
             }
         }

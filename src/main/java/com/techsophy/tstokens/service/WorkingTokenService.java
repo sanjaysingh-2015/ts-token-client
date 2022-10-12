@@ -72,21 +72,21 @@ public class WorkingTokenService {
     private synchronized String getNextTokenNo(WorkingToken token) {
         String prefix = "";
         Query query = new Query();
-        if(!StringUtils.isEmpty(token.getOrganizationCode())) {
+        if (!StringUtils.isEmpty(token.getOrganizationCode())) {
             Optional<Organization> organization = organizationRepository.findByCodeAndStatus(token.getOrganizationCode(), ACTIVE);
-            if(organization.isPresent()) {
+            if (organization.isPresent()) {
                 prefix = organization.get().getTokenPrefix();
                 if (!StringUtils.isEmpty(token.getDepartmentCode())) {
                     Optional<Department> department = departmentRepository.findByOrganizationCodeAndCodeAndStatus(organization.get().getCode(), token.getDepartmentCode(), ACTIVE);
-                    if(department.isPresent()) {
+                    if (department.isPresent()) {
                         prefix = department.get().getTokenPrefix();
                         if (!StringUtils.isEmpty(token.getTokenCategoryCode())) {
                             Optional<TokenCategory> category = tokenCategoryRepository.findByOrganizationCodeAndDepartmentCodeAndCodeAndStatus(organization.get().getCode(), department.get().getCode(), token.getTokenCategoryCode(), ACTIVE);
-                            if(category.isPresent()) {
+                            if (category.isPresent()) {
                                 prefix = category.get().getTokenPrefix();
                                 if (!StringUtils.isEmpty(token.getTokenTypeCode())) {
                                     Optional<TokenType> tokenType = tokenTypeRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCodeAndStatus(organization.get().getCode(), department.get().getCode(), category.get().getCode(), token.getTokenTypeCode(), ACTIVE);
-                                    if(tokenType.isPresent()) {
+                                    if (tokenType.isPresent()) {
                                         prefix = tokenType.get().getTokenPrefix();
                                         query.addCriteria(Criteria.where("organizationCode").is(token.getOrganizationCode())
                                                 .and("departmentCode").is(token.getDepartmentCode())

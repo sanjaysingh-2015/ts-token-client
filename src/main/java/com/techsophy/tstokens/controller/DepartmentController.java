@@ -33,22 +33,22 @@ public class DepartmentController {
     }
 
     @PostMapping(value = "/{org-code}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<IApiResponse> createDepartment(@PathVariable(name = "org-code") String orgCode,@RequestBody @Valid DepartmentCreateRequestPayload requestPayload) {
+    public ResponseEntity<IApiResponse> createDepartment(@PathVariable(name = "org-code") String orgCode, @RequestBody @Valid DepartmentCreateRequestPayload requestPayload) {
         logger.info("In createOrganization()");
-        DepartmentResponsePayload response = departmentService.createDepartment(orgCode,requestPayload);
+        DepartmentResponsePayload response = departmentService.createDepartment(orgCode, requestPayload);
         return ResponseEntity.ok()
                 .body(new ApiResponse(response, true, "Department Created Successfully with Code: " + response.getCode()));
     }
 
     @PutMapping(value = "/{org-code}/{dept-code}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<IApiResponse> updateOrganization(@PathVariable("org-code") String orgCode, @PathVariable("dept-code") String deptCode,@RequestBody @Valid DepartmentUpdateRequestPayload requestPayload) {
+    public ResponseEntity<IApiResponse> updateOrganization(@PathVariable("org-code") String orgCode, @PathVariable("dept-code") String deptCode, @RequestBody @Valid DepartmentUpdateRequestPayload requestPayload) {
         logger.info("In updateOrganization()");
         DepartmentResponsePayload response = departmentService.updateDepartment(orgCode, deptCode, requestPayload);
         return ResponseEntity.ok()
                 .body(new ApiResponse(response, true, "Organization Updated Successfully with Code: " + response.getCode()));
     }
 
-    @GetMapping(value ={"", "/{org-code}"}, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = {"", "/{org-code}"}, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<IApiResponse> getOrganizationList(@PathVariable(name = "org-code", required = false) String orgCode) {
         logger.info("In getDepartmentList()");
         List<DepartmentResponsePayload> response = departmentService.getDepartmentList(orgCode);

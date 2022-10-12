@@ -28,9 +28,9 @@ public class ProcessStage {
     private String tokenCategoryCode;
     @Size(max = 10)
     private String tokenTypeCode;
-    @Size(max =10)
+    @Size(max = 10)
     private String code;
-    @Size(max =10)
+    @Size(max = 10)
     private String name;
     @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private Date createdOn;

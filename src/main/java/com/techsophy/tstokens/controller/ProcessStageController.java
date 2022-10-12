@@ -41,27 +41,27 @@ public class ProcessStageController {
     }
 
     @PutMapping(value = "/{stage-code}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<IApiResponse> updateProcessStage(@PathVariable("stage-code") String stageCode,@RequestBody @Valid ProcessStageUpdateRequestPayload requestPayload) {
+    public ResponseEntity<IApiResponse> updateProcessStage(@PathVariable("stage-code") String stageCode, @RequestBody @Valid ProcessStageUpdateRequestPayload requestPayload) {
         logger.info("In updateProcessStage()");
         ProcessStageResponsePayload response = processStageService.updateProcessStage(stageCode, requestPayload);
         return ResponseEntity.ok()
                 .body(new ApiResponse(response, true, "Process Stage Updated Successfully with Code: " + response.getCode()));
     }
 
-    @GetMapping(value ={"", ""}, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = {"", ""}, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<IApiResponse> getProcessStageList(
             @RequestParam(name = "org-code", required = false) String orgCode,
             @RequestParam(name = "dept-code", required = false) String deptCode,
             @RequestParam(name = "cat-code", required = false) String catCode,
             @RequestParam(name = "token_type-code", required = false) String tokenTypeCode) {
         logger.info("In getDepartmentList()");
-        List<ProcessStageResponsePayload> response = processStageService.getProcessStageList(orgCode, deptCode, catCode,tokenTypeCode);
+        List<ProcessStageResponsePayload> response = processStageService.getProcessStageList(orgCode, deptCode, catCode, tokenTypeCode);
         return ResponseEntity.ok()
                 .body(new ApiResponse(response, true, "Process Stage Details Fetched Successfully"));
     }
 
     @GetMapping(value = "/{stage-code}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<IApiResponse> getProcessStageDetails(@PathVariable(name="stage-code") String stageCode,
+    public ResponseEntity<IApiResponse> getProcessStageDetails(@PathVariable(name = "stage-code") String stageCode,
                                                                @RequestParam(name = "org-code", required = false) String orgCode,
                                                                @RequestParam(name = "dept-code", required = false) String deptCode,
                                                                @RequestParam(name = "cat-code", required = false) String catCode,

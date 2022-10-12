@@ -47,7 +47,7 @@ public class TokenTypeService {
         Optional<TokenType> tokenTypeOpt = tokenTypeRepository.findByTokenCategoryCodeAndCode(tokenCatCode, tokenTypeCode);
         TokenTypeResponsePayload response = null;
         ApplicationMapping<TokenTypeResponsePayload, TokenType> responseMapping = new ApplicationMapping<>();
-        if(tokenTypeOpt.isPresent()) {
+        if (tokenTypeOpt.isPresent()) {
             response = responseMapping.convert(tokenTypeOpt.get(), TokenTypeResponsePayload.class);
         }
         return response;
@@ -67,15 +67,16 @@ public class TokenTypeService {
     public TokenTypeResponsePayload createTokenType(String tokenCatCode, TokenTypeCreateRequestPayload requestPayload) {
         logger.info("In createTokenType()");
         Optional<TokenCategory> tokenCategoryOpt = tokenCategoryRepository.findByCode(tokenCatCode);
-        if(tokenCategoryOpt.isEmpty()) {
+        if (tokenCategoryOpt.isEmpty()) {
             throw new ResourceNotFoundException("TOken Category does not exists with this code");
         }
         Map<String, String> errors = new HashMap<>();
         //validationUtils.validateTokenType(tokenCatCode,requestPayload, errors);
         ApplicationMapping<TokenType, TokenTypeCreateRequestPayload> mapping = new ApplicationMapping<>();
         TokenType tokenType = mapping.convert(requestPayload, TokenType.class);
-        return saveTokenType(tokenCategoryOpt.get(),tokenType);
+        return saveTokenType(tokenCategoryOpt.get(), tokenType);
     }
+
     public TokenTypeResponsePayload saveTokenType(TokenCategory tokenCategory, TokenType tokenType) {
         logger.info("In saveTokenType()");
         tokenType.setOrganizationCode(tokenCategory.getOrganizationCode());
@@ -83,12 +84,13 @@ public class TokenTypeService {
         tokenType.setTokenCategoryCode(tokenCategory.getCode());
         tokenType.setCreatedOn(new Date());
         tokenType.setStatus(CREATED);
-        tokenType.setCode(SecurityUtils.generateCode(tokenCategory.getName(),4));
+        tokenType.setCode(SecurityUtils.generateCode(tokenCategory.getName(), 4));
         tokenTypeRepository.save(tokenType);
 
         ApplicationMapping<TokenTypeResponsePayload, TokenType> responseMapping = new ApplicationMapping<>();
         return responseMapping.convert(tokenType, TokenTypeResponsePayload.class);
     }
+
     public TokenTypeResponsePayload updateTokenType(String tokenCatCode, String tokenTypeCode, TokenTypeUpdateRequestPayload requestPayload) {
         logger.info("In updateTokenType()");
         Optional<TokenType> tokenTypeOpt;

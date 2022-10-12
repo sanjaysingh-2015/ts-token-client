@@ -33,9 +33,9 @@ public class TokenTypeController {
     }
 
     @PostMapping(value = "/{token-cat-code}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<IApiResponse> createTokenType(@PathVariable("token-cat-code") String tokenCatCode,@RequestBody @Valid TokenTypeCreateRequestPayload requestPayload) {
+    public ResponseEntity<IApiResponse> createTokenType(@PathVariable("token-cat-code") String tokenCatCode, @RequestBody @Valid TokenTypeCreateRequestPayload requestPayload) {
         logger.info("In createOrganization()");
-        TokenTypeResponsePayload response = tokenTypeService.createTokenType(tokenCatCode,requestPayload);
+        TokenTypeResponsePayload response = tokenTypeService.createTokenType(tokenCatCode, requestPayload);
         return ResponseEntity.ok()
                 .body(new ApiResponse(response, true, "Token Type Created Successfully with Code: " + response.getCode()));
     }
@@ -43,7 +43,7 @@ public class TokenTypeController {
     @PutMapping(value = "/{token-cat-code}/{token-type-code}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<IApiResponse> updateTokenType(@PathVariable("token-cat-code") String tokenCatCode, @PathVariable("token-type-code") String tokenTypeCode, @RequestBody @Valid TokenTypeUpdateRequestPayload requestPayload) {
         logger.info("In updateOrganization()");
-        TokenTypeResponsePayload response = tokenTypeService.updateTokenType( tokenCatCode, tokenTypeCode, requestPayload);
+        TokenTypeResponsePayload response = tokenTypeService.updateTokenType(tokenCatCode, tokenTypeCode, requestPayload);
         return ResponseEntity.ok()
                 .body(new ApiResponse(response, true, "Token Type Updated Successfully with Code: " + response.getCode()));
     }

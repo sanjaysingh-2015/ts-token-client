@@ -44,32 +44,33 @@ public class CounterService {
         logger.info("In getCounterDetails()");
         //TODO: Validation
         Optional<Counter> counterOpt = Optional.empty();
-        if(!StringUtils.isEmpty(orgCode)) {
-            if(!StringUtils.isEmpty(deptCode)) {
-                if(!StringUtils.isEmpty(catCode)) {
-                    if(!StringUtils.isEmpty(tokenTypeCode)) {
-                        counterOpt = counterRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCodeAndCode(orgCode, deptCode, catCode, tokenTypeCode,counterNo);
+        if (!StringUtils.isEmpty(orgCode)) {
+            if (!StringUtils.isEmpty(deptCode)) {
+                if (!StringUtils.isEmpty(catCode)) {
+                    if (!StringUtils.isEmpty(tokenTypeCode)) {
+                        counterOpt = counterRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCodeAndCode(orgCode, deptCode, catCode, tokenTypeCode, counterNo);
                     } else {
-                        counterOpt = counterRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCode(orgCode, deptCode, catCode,counterNo);
+                        counterOpt = counterRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCode(orgCode, deptCode, catCode, counterNo);
                     }
                 } else {
-                    counterOpt = counterRepository.findByOrganizationCodeAndDepartmentCodeAndCode(orgCode, deptCode,counterNo);
+                    counterOpt = counterRepository.findByOrganizationCodeAndDepartmentCodeAndCode(orgCode, deptCode, counterNo);
                 }
             } else {
-                counterOpt = counterRepository.findByOrganizationCodeAndCode(orgCode,counterNo);
+                counterOpt = counterRepository.findByOrganizationCodeAndCode(orgCode, counterNo);
             }
         } else {
             counterOpt = counterRepository.findByCode(counterNo);
         }
         CounterResponsePayload response = null;
         ApplicationMapping<CounterResponsePayload, Counter> responseMapping = new ApplicationMapping<>();
-        if(counterOpt.isPresent()) {
+        if (counterOpt.isPresent()) {
             response = responseMapping.convert(counterOpt.get(), CounterResponsePayload.class);
         } else {
             throw new ResourceNotFoundException("TS908- Invalid input, supplied data does not exists");
         }
         return response;
     }
+
     public List<CounterResponsePayload> getCounterList(String orgCode, String deptCode, String catCode, String tokenTypeCode) {
         logger.info("In getCounterDetails()");
         List<Counter> counterList;
@@ -101,6 +102,7 @@ public class CounterService {
         }
         return response;
     }
+
     public CounterResponsePayload createCounter(CounterCreateRequestPayload requestPayload) {
         logger.info("In createCounter()");
 
@@ -110,12 +112,13 @@ public class CounterService {
         Counter counter = mapping.convert(requestPayload, Counter.class);
         return saveCounter(counter);
     }
+
     public CounterResponsePayload saveCounter(Counter counter) {
         logger.info("In saveCounter()");
         organizationRepository.findByCodeAndStatus(counter.getOrganizationCode(), CREATED).orElseThrow(() -> new ResourceNotFoundException("Invalid Organization Code Provided"));
         departmentRepository.findByOrganizationCodeAndCodeAndStatus(counter.getOrganizationCode(), counter.getDepartmentCode(), CREATED).orElseThrow(() -> new ResourceNotFoundException("Invalid Department Code Provided"));
         tokenCategoryRepository.findByOrganizationCodeAndDepartmentCodeAndCodeAndStatus(counter.getOrganizationCode(), counter.getDepartmentCode(), counter.getTokenCategoryCode(), CREATED).orElseThrow(() -> new ResourceNotFoundException("Invalid Category Code Provided"));
-        tokenTypeRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCodeAndStatus(counter.getOrganizationCode(), counter.getDepartmentCode(), counter.getTokenCategoryCode(),counter.getTokenTypeCode(), CREATED).orElseThrow(() -> new ResourceNotFoundException("Invalid Token Type Code Provided"));
+        tokenTypeRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCodeAndStatus(counter.getOrganizationCode(), counter.getDepartmentCode(), counter.getTokenCategoryCode(), counter.getTokenTypeCode(), CREATED).orElseThrow(() -> new ResourceNotFoundException("Invalid Token Type Code Provided"));
         counter.setCreatedOn(new Date());
         counter.setStatus(CREATED);
         counterRepository.save(counter);
@@ -123,28 +126,29 @@ public class CounterService {
         ApplicationMapping<CounterResponsePayload, Counter> responseMapping = new ApplicationMapping<>();
         return responseMapping.convert(counter, CounterResponsePayload.class);
     }
+
     public CounterResponsePayload updateCounter(String code, CounterUpdateRequestPayload requestPayload) {
         logger.info("In updateCounter()");
         Optional<Counter> counterOpt = Optional.empty();
-        if(!StringUtils.isEmpty(requestPayload.getOrganizationCode())) {
-            if(!StringUtils.isEmpty(requestPayload.getDepartmentCode())) {
-                if(!StringUtils.isEmpty(requestPayload.getTokenCategoryCode())) {
-                    if(!StringUtils.isEmpty(requestPayload.getTokenTypeCode())) {
+        if (!StringUtils.isEmpty(requestPayload.getOrganizationCode())) {
+            if (!StringUtils.isEmpty(requestPayload.getDepartmentCode())) {
+                if (!StringUtils.isEmpty(requestPayload.getTokenCategoryCode())) {
+                    if (!StringUtils.isEmpty(requestPayload.getTokenTypeCode())) {
                         counterOpt = counterRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCodeAndCode(requestPayload.getOrganizationCode(), requestPayload.getDepartmentCode(), requestPayload.getTokenCategoryCode(), requestPayload.getTokenTypeCode(), code);
                     } else {
-                        counterOpt = counterRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCode(requestPayload.getOrganizationCode(), requestPayload.getDepartmentCode(), requestPayload.getTokenCategoryCode(),code);
+                        counterOpt = counterRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCode(requestPayload.getOrganizationCode(), requestPayload.getDepartmentCode(), requestPayload.getTokenCategoryCode(), code);
                     }
                 } else {
-                    counterOpt = counterRepository.findByOrganizationCodeAndDepartmentCodeAndCode(requestPayload.getOrganizationCode(), requestPayload.getDepartmentCode(),code);
+                    counterOpt = counterRepository.findByOrganizationCodeAndDepartmentCodeAndCode(requestPayload.getOrganizationCode(), requestPayload.getDepartmentCode(), code);
                 }
             } else {
-                counterOpt = counterRepository.findByOrganizationCodeAndCode(requestPayload.getOrganizationCode(),code);
+                counterOpt = counterRepository.findByOrganizationCodeAndCode(requestPayload.getOrganizationCode(), code);
             }
         } else {
             counterOpt = counterRepository.findByCode(code);
         }
         Counter counter = new Counter();
-        if(counterOpt.isPresent()) {
+        if (counterOpt.isPresent()) {
             counter = counterOpt.get();
             counter.setStatus(requestPayload.getStatus());
         } else {
@@ -156,6 +160,7 @@ public class CounterService {
         ApplicationMapping<CounterResponsePayload, Counter> responseMapping = new ApplicationMapping<>();
         return responseMapping.convert(counter, CounterResponsePayload.class);
     }
+
     public String deleteCounter(String stageId) {
         logger.info("In deleteCounter()");
         Counter counter = counterRepository.findById(stageId).orElseThrow(

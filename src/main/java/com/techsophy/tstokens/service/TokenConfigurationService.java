@@ -38,14 +38,14 @@ public class TokenConfigurationService {
 
     public String initializeTokenForDate(TokenInitializeApiRequestPayload request) {
         Optional<TokenConfiguration> tokenConfigurationOpt = Optional.empty();
-        Organization organization = organizationRepository.findByCodeAndStatus(request.getOrganizationCode(),ACTIVE).orElseThrow(
+        Organization organization = organizationRepository.findByCodeAndStatus(request.getOrganizationCode(), ACTIVE).orElseThrow(
                 () -> new ResourceNotFoundException("Invalid Organization"));
         Optional<Department> department = departmentRepository.findByOrganizationCodeAndCodeAndStatus(request.getOrganizationCode(), request.getDepartmentCode(), ACTIVE);
-        if(department.isPresent()) {
+        if (department.isPresent()) {
             Optional<TokenCategory> category = tokenCategoryRepository.findByOrganizationCodeAndDepartmentCodeAndCodeAndStatus(request.getOrganizationCode(), request.getDepartmentCode(), request.getCategoryCode(), ACTIVE);
-            if(category.isPresent()) {
+            if (category.isPresent()) {
                 Optional<TokenType> tokenType = tokenTypeRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCodeAndStatus(request.getOrganizationCode(), request.getDepartmentCode(), request.getCategoryCode(), request.getTokenTypeCode(), ACTIVE);
-                if(tokenType.isPresent()) {
+                if (tokenType.isPresent()) {
                     tokenConfigurationOpt = tokenConfigurationRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCodeAndWorkDate(request.getOrganizationCode(), request.getDepartmentCode(), request.getCategoryCode(), request.getTokenTypeCode(), request.getWorkDate());
                 } else {
                     tokenConfigurationOpt = tokenConfigurationRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndWorkDate(request.getOrganizationCode(), request.getDepartmentCode(), request.getCategoryCode(), request.getWorkDate());
@@ -57,8 +57,8 @@ public class TokenConfigurationService {
             tokenConfigurationOpt = tokenConfigurationRepository.findByOrganizationCodeAndWorkDate(request.getOrganizationCode(), request.getWorkDate());
         }
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
-        if(tokenConfigurationOpt.isPresent()) {
-            throw new InvalidOperationException("TST-901: Token Initialization Already Done for Date: "+ simpleDateFormat.format(request.getWorkDate()));
+        if (tokenConfigurationOpt.isPresent()) {
+            throw new InvalidOperationException("TST-901: Token Initialization Already Done for Date: " + simpleDateFormat.format(request.getWorkDate()));
         } else {
             TokenConfiguration tokenConfiguration = new TokenConfiguration();
             tokenConfiguration.setOrganizationCode(request.getOrganizationCode());
@@ -71,20 +71,20 @@ public class TokenConfigurationService {
             tokenConfiguration.setUserName(request.getUserName());
             tokenConfiguration.setStatus(CONFIG_STATUS_INIT);
             tokenConfigurationRepository.save(tokenConfiguration);
-            return "Token Initialization Done for Date: "+ simpleDateFormat.format(request.getWorkDate());
+            return "Token Initialization Done for Date: " + simpleDateFormat.format(request.getWorkDate());
         }
     }
 
     public String closeTokenForDate(TokenInitializeApiRequestPayload request) {
         Optional<TokenConfiguration> tokenConfigurationOpt = Optional.empty();
-        Organization organization = organizationRepository.findByCodeAndStatus(request.getOrganizationCode(),ACTIVE).orElseThrow(
+        Organization organization = organizationRepository.findByCodeAndStatus(request.getOrganizationCode(), ACTIVE).orElseThrow(
                 () -> new ResourceNotFoundException("Invalid Organization"));
         Optional<Department> department = departmentRepository.findByOrganizationCodeAndCodeAndStatus(request.getOrganizationCode(), request.getDepartmentCode(), ACTIVE);
-        if(department.isPresent()) {
+        if (department.isPresent()) {
             Optional<TokenCategory> category = tokenCategoryRepository.findByOrganizationCodeAndDepartmentCodeAndCodeAndStatus(request.getOrganizationCode(), request.getDepartmentCode(), request.getCategoryCode(), ACTIVE);
-            if(category.isPresent()) {
+            if (category.isPresent()) {
                 Optional<TokenType> tokenType = tokenTypeRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCodeAndStatus(request.getOrganizationCode(), request.getDepartmentCode(), request.getCategoryCode(), request.getTokenTypeCode(), ACTIVE);
-                if(tokenType.isPresent()) {
+                if (tokenType.isPresent()) {
                     tokenConfigurationOpt = tokenConfigurationRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCodeAndWorkDate(request.getOrganizationCode(), request.getDepartmentCode(), request.getCategoryCode(), request.getTokenTypeCode(), request.getWorkDate());
                 } else {
                     tokenConfigurationOpt = tokenConfigurationRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndWorkDate(request.getOrganizationCode(), request.getDepartmentCode(), request.getCategoryCode(), request.getWorkDate());
@@ -96,15 +96,15 @@ public class TokenConfigurationService {
             tokenConfigurationOpt = tokenConfigurationRepository.findByOrganizationCodeAndWorkDate(request.getOrganizationCode(), request.getWorkDate());
         }
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
-        if(tokenConfigurationOpt.isPresent()) {
-            if(tokenConfigurationOpt.get().getStatus().equalsIgnoreCase(CONFIG_STATUS_CLOSED)) {
-                throw new InvalidOperationException("TST-903: Token Service Already Closed for Date: "+ simpleDateFormat.format(request.getWorkDate()));
+        if (tokenConfigurationOpt.isPresent()) {
+            if (tokenConfigurationOpt.get().getStatus().equalsIgnoreCase(CONFIG_STATUS_CLOSED)) {
+                throw new InvalidOperationException("TST-903: Token Service Already Closed for Date: " + simpleDateFormat.format(request.getWorkDate()));
             }
             tokenConfigurationOpt.get().setStatus(CONFIG_STATUS_CLOSED);
             tokenConfigurationRepository.save(tokenConfigurationOpt.get());
-            return "Token Service successfully closed for Date: "+ simpleDateFormat.format(request.getWorkDate());
+            return "Token Service successfully closed for Date: " + simpleDateFormat.format(request.getWorkDate());
         } else {
-            throw new InvalidOperationException("TST-902: Token Yet not Initialization for Date: "+ simpleDateFormat.format(request.getWorkDate()));
+            throw new InvalidOperationException("TST-902: Token Yet not Initialization for Date: " + simpleDateFormat.format(request.getWorkDate()));
         }
     }
 }

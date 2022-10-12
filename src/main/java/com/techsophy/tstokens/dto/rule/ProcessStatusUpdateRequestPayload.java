@@ -20,10 +20,10 @@ public class ProcessStatusUpdateRequestPayload {
     private String tokenCategoryCode;
     @Size(max = 10)
     private String tokenTypeCode;
-    @Size(max =10)
+    @Size(max = 10)
     private String code;
-    @Size(max =10)
+    @Size(max = 10)
     private String name;
-    @Size(max =10)
+    @Size(max = 10)
     private String status;
 }

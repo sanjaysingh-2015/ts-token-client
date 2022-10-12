@@ -44,32 +44,33 @@ public class DeviceService {
         logger.info("In getDeviceDetails()");
         //TODO: Validation
         Optional<Device> deviceOpt = Optional.empty();
-        if(!StringUtils.isEmpty(orgCode)) {
-            if(!StringUtils.isEmpty(deptCode)) {
-                if(!StringUtils.isEmpty(catCode)) {
-                    if(!StringUtils.isEmpty(tokenTypeCode)) {
-                        deviceOpt = deviceRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCodeAndDeviceUid(orgCode, deptCode, catCode, tokenTypeCode,deviceUid);
+        if (!StringUtils.isEmpty(orgCode)) {
+            if (!StringUtils.isEmpty(deptCode)) {
+                if (!StringUtils.isEmpty(catCode)) {
+                    if (!StringUtils.isEmpty(tokenTypeCode)) {
+                        deviceOpt = deviceRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCodeAndDeviceUid(orgCode, deptCode, catCode, tokenTypeCode, deviceUid);
                     } else {
-                        deviceOpt = deviceRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndDeviceUid(orgCode, deptCode, catCode,deviceUid);
+                        deviceOpt = deviceRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndDeviceUid(orgCode, deptCode, catCode, deviceUid);
                     }
                 } else {
-                    deviceOpt = deviceRepository.findByOrganizationCodeAndDepartmentCodeAndDeviceUid(orgCode, deptCode,deviceUid);
+                    deviceOpt = deviceRepository.findByOrganizationCodeAndDepartmentCodeAndDeviceUid(orgCode, deptCode, deviceUid);
                 }
             } else {
-                deviceOpt = deviceRepository.findByOrganizationCodeAndDeviceUid(orgCode,deviceUid);
+                deviceOpt = deviceRepository.findByOrganizationCodeAndDeviceUid(orgCode, deviceUid);
             }
         } else {
             deviceOpt = deviceRepository.findByDeviceUid(deviceUid);
         }
         DeviceResponsePayload response = null;
         ApplicationMapping<DeviceResponsePayload, Device> responseMapping = new ApplicationMapping<>();
-        if(deviceOpt.isPresent()) {
+        if (deviceOpt.isPresent()) {
             response = responseMapping.convert(deviceOpt.get(), DeviceResponsePayload.class);
         } else {
             throw new ResourceNotFoundException("TS908- Invalid input, supplied data does not exists");
         }
         return response;
     }
+
     public List<DeviceResponsePayload> getDeviceList(String orgCode, String deptCode, String catCode, String tokenTypeCode) {
         logger.info("In getDeviceDetails()");
         List<Device> deviceList;
@@ -101,6 +102,7 @@ public class DeviceService {
         }
         return response;
     }
+
     public DeviceResponsePayload createDevice(DeviceCreateRequestPayload requestPayload) {
         logger.info("In createDevice()");
 
@@ -110,12 +112,13 @@ public class DeviceService {
         Device device = mapping.convert(requestPayload, Device.class);
         return saveDevice(device);
     }
+
     public DeviceResponsePayload saveDevice(Device device) {
         logger.info("In saveDevice()");
         organizationRepository.findByCodeAndStatus(device.getOrganizationCode(), CREATED).orElseThrow(() -> new ResourceNotFoundException("Invalid Organization Code Provided"));
         departmentRepository.findByOrganizationCodeAndCodeAndStatus(device.getOrganizationCode(), device.getDepartmentCode(), CREATED).orElseThrow(() -> new ResourceNotFoundException("Invalid Department Code Provided"));
         tokenCategoryRepository.findByOrganizationCodeAndDepartmentCodeAndCodeAndStatus(device.getOrganizationCode(), device.getDepartmentCode(), device.getTokenCategoryCode(), CREATED).orElseThrow(() -> new ResourceNotFoundException("Invalid Category Code Provided"));
-        tokenTypeRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCodeAndStatus(device.getOrganizationCode(), device.getDepartmentCode(), device.getTokenCategoryCode(),device.getTokenTypeCode(), CREATED).orElseThrow(() -> new ResourceNotFoundException("Invalid Token Type Code Provided"));
+        tokenTypeRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCodeAndStatus(device.getOrganizationCode(), device.getDepartmentCode(), device.getTokenCategoryCode(), device.getTokenTypeCode(), CREATED).orElseThrow(() -> new ResourceNotFoundException("Invalid Token Type Code Provided"));
         device.setCreatedOn(new Date());
         device.setStatus(CREATED);
         deviceRepository.save(device);
@@ -123,28 +126,29 @@ public class DeviceService {
         ApplicationMapping<DeviceResponsePayload, Device> responseMapping = new ApplicationMapping<>();
         return responseMapping.convert(device, DeviceResponsePayload.class);
     }
+
     public DeviceResponsePayload updateDevice(String deviceUid, DeviceUpdateRequestPayload requestPayload) {
         logger.info("In updateDevice()");
         Optional<Device> deviceOpt = Optional.empty();
-        if(!StringUtils.isEmpty(requestPayload.getOrganizationCode())) {
-            if(!StringUtils.isEmpty(requestPayload.getDepartmentCode())) {
-                if(!StringUtils.isEmpty(requestPayload.getTokenCategoryCode())) {
-                    if(!StringUtils.isEmpty(requestPayload.getTokenTypeCode())) {
+        if (!StringUtils.isEmpty(requestPayload.getOrganizationCode())) {
+            if (!StringUtils.isEmpty(requestPayload.getDepartmentCode())) {
+                if (!StringUtils.isEmpty(requestPayload.getTokenCategoryCode())) {
+                    if (!StringUtils.isEmpty(requestPayload.getTokenTypeCode())) {
                         deviceOpt = deviceRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCodeAndDeviceUid(requestPayload.getOrganizationCode(), requestPayload.getDepartmentCode(), requestPayload.getTokenCategoryCode(), requestPayload.getTokenTypeCode(), deviceUid);
                     } else {
-                        deviceOpt = deviceRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndDeviceUid(requestPayload.getOrganizationCode(), requestPayload.getDepartmentCode(), requestPayload.getTokenCategoryCode(),deviceUid);
+                        deviceOpt = deviceRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndDeviceUid(requestPayload.getOrganizationCode(), requestPayload.getDepartmentCode(), requestPayload.getTokenCategoryCode(), deviceUid);
                     }
                 } else {
-                    deviceOpt = deviceRepository.findByOrganizationCodeAndDepartmentCodeAndDeviceUid(requestPayload.getOrganizationCode(), requestPayload.getDepartmentCode(),deviceUid);
+                    deviceOpt = deviceRepository.findByOrganizationCodeAndDepartmentCodeAndDeviceUid(requestPayload.getOrganizationCode(), requestPayload.getDepartmentCode(), deviceUid);
                 }
             } else {
-                deviceOpt = deviceRepository.findByOrganizationCodeAndDeviceUid(requestPayload.getOrganizationCode(),deviceUid);
+                deviceOpt = deviceRepository.findByOrganizationCodeAndDeviceUid(requestPayload.getOrganizationCode(), deviceUid);
             }
         } else {
             deviceOpt = deviceRepository.findByDeviceUid(deviceUid);
         }
         Device device = new Device();
-        if(deviceOpt.isPresent()) {
+        if (deviceOpt.isPresent()) {
             device = deviceOpt.get();
             device.setStatus(requestPayload.getStatus());
         } else {
@@ -156,6 +160,7 @@ public class DeviceService {
         ApplicationMapping<DeviceResponsePayload, Device> responseMapping = new ApplicationMapping<>();
         return responseMapping.convert(device, DeviceResponsePayload.class);
     }
+
     public String deleteDevice(String stageId) {
         logger.info("In deleteDevice()");
         Device device = deviceRepository.findById(stageId).orElseThrow(

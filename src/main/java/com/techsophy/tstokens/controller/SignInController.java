@@ -70,7 +70,7 @@ public class SignInController {
 
         Optional<User> userOpt = userRepository.findById(userDetails.getId());
         UserInfoResponse userInfoResponse = new UserInfoResponse();
-        if(userOpt.isPresent()) {
+        if (userOpt.isPresent()) {
             userInfoResponse = new UserInfoResponse(
                     userDetails.getId(),
                     userOpt.get().getFirstName(),

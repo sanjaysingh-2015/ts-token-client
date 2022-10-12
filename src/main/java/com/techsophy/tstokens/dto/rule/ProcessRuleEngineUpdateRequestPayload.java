@@ -21,12 +21,12 @@ public class ProcessRuleEngineUpdateRequestPayload {
     @Size(max = 10)
     private String tokenTypeCode;
     private String currentStageCode;
-    @Size(max =10)
+    @Size(max = 10)
     private String currentStatusCode;
-    @Size(max =10)
+    @Size(max = 10)
     private String nextStageCode;
-    @Size(max =10)
+    @Size(max = 10)
     private String nextStatusCode;
-    @Size(max =10)
+    @Size(max = 10)
     private String status;
 }

@@ -10,7 +10,10 @@ import java.util.Optional;
 @Repository
 public interface TokenConfigurationRepository extends MongoRepository<TokenConfiguration, String> {
     Optional<TokenConfiguration> findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCodeAndWorkDate(String orgCode, String deptCode, String tokenCat, String tokenTypeCode, Date workDate);
+
     Optional<TokenConfiguration> findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndWorkDate(String orgCode, String deptCode, String tokenCat, Date workDate);
+
     Optional<TokenConfiguration> findByOrganizationCodeAndDepartmentCodeAndWorkDate(String orgCode, String deptCode, Date workDate);
+
     Optional<TokenConfiguration> findByOrganizationCodeAndWorkDate(String orgCode, Date workDate);
 }

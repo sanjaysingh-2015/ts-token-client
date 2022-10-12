@@ -20,10 +20,10 @@ public class CounterProcessStageMapUpdateRequestPayload {
     private String tokenCategoryCode;
     @Size(max = 10)
     private String tokenTypeCode;
-    @Size(max =10)
+    @Size(max = 10)
     private String counterCode;
-    @Size(max =10)
+    @Size(max = 10)
     private String processStageCode;
-    @Size(max =10)
+    @Size(max = 10)
     private String status;
 }

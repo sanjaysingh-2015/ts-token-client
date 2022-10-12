@@ -17,8 +17,8 @@ public class SecurityUtils {
     }
 
     public static String generateCode(String organizationName, Integer length) {
-        Long orgNo = (long)(Math.floor(Math.random() * (9*Math.pow(10,length-1))) + Math.pow(10,(length-1)));
-        return shuffleString(organizationName.toUpperCase().replace(" ","")) + orgNo.toString();
+        Long orgNo = (long) (Math.floor(Math.random() * (9 * Math.pow(10, length - 1))) + Math.pow(10, (length - 1)));
+        return shuffleString(organizationName.toUpperCase().replace(" ", "")) + orgNo.toString();
     }
 
     private static String shuffleString(String organizationName) {
@@ -28,6 +28,6 @@ public class SecurityUtils {
         for (String letter : letters) {
             shuffled += letter;
         }
-        return shuffled.substring(0,3);
+        return shuffled.substring(0, 3);
     }
 }

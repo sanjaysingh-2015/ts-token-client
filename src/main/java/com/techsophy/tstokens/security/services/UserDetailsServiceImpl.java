@@ -13,25 +13,25 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
-  @Autowired
-  OrganizationRepository organizationRepository;
-  @Autowired
-  UserRepository userRepository;
+    @Autowired
+    OrganizationRepository organizationRepository;
+    @Autowired
+    UserRepository userRepository;
 
-  @Transactional
-  public UserDetails loadUserByOrganizationCode(String username) throws UsernameNotFoundException {
-    Organization organization = organizationRepository.findByCodeAndStatus(username, "ACTIVE")
-        .orElseThrow(() -> new UsernameNotFoundException("Organization Not Found with username: " + username));
+    @Transactional
+    public UserDetails loadUserByOrganizationCode(String username) throws UsernameNotFoundException {
+        Organization organization = organizationRepository.findByCodeAndStatus(username, "ACTIVE")
+                .orElseThrow(() -> new UsernameNotFoundException("Organization Not Found with username: " + username));
 
-    return UserDetailsImpl.build(organization);
-  }
+        return UserDetailsImpl.build(organization);
+    }
 
-  @Override
-  @Transactional
-  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    User user = userRepository.findByUsername(username)
-            .orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
+    @Override
+    @Transactional
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
 
-    return UserDetailsImpl.build(user);
-  }
+        return UserDetailsImpl.build(user);
+    }
 }

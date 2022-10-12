@@ -27,7 +27,7 @@ public class MenuService {
         List<Menu> menuList = menuRepository.findByStatus("ACTIVE");
         List<MenuResponsePayload> response = new ArrayList<>();
         ApplicationMapping<MenuResponsePayload, Menu> responseMapping = new ApplicationMapping<>();
-        for(Menu menu: menuList) {
+        for (Menu menu : menuList) {
             response.add(responseMapping.convert(menu, MenuResponsePayload.class));
         }
         return response;

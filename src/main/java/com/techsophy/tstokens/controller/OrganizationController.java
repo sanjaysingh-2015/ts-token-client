@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+
 @Slf4j
 @Validated
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -33,6 +34,7 @@ public class OrganizationController {
     public OrganizationController(OrganizationService organizationService) {
         this.organizationService = organizationService;
     }
+
     @Operation(summary = "Creates a new Organization")
     @PostMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<IApiResponse> createOrganization(@RequestBody @Valid OrganizationCreateRequestPayload requestPayload) {
@@ -41,6 +43,7 @@ public class OrganizationController {
         return ResponseEntity.ok()
                 .body(new ApiResponse(response, true, "Organization Created Successfully with Code: " + response.getCode()));
     }
+
     @Operation(summary = "Updates an existing Organization")
     @PutMapping(value = "/{org-code}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<IApiResponse> updateOrganization(@PathVariable("org-code") String orgCode, @RequestBody @Valid OrganizationUpdateRequestPayload requestPayload) {
@@ -49,6 +52,7 @@ public class OrganizationController {
         return ResponseEntity.ok()
                 .body(new ApiResponse(response, true, "Organization Updated Successfully with Code: " + response.getCode()));
     }
+
     @Operation(summary = "Get list of Organizations")
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<IApiResponse> getOrganizationList() {
@@ -57,6 +61,7 @@ public class OrganizationController {
         return ResponseEntity.ok()
                 .body(new ApiResponse(response, true, "Organization Details Fetched Successfully"));
     }
+
     @Operation(summary = "Get Details of an Organization")
     @GetMapping(value = "/{org-code}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<IApiResponse> getOrganizationDetails(@PathVariable("org-code") String orgCode) {

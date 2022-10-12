@@ -41,31 +41,31 @@ public class CounterController {
     }
 
     @PutMapping(value = "/{counter-code}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<IApiResponse> updateCounter(@PathVariable("counter-code") String counterCode,@RequestBody @Valid CounterUpdateRequestPayload requestPayload) {
+    public ResponseEntity<IApiResponse> updateCounter(@PathVariable("counter-code") String counterCode, @RequestBody @Valid CounterUpdateRequestPayload requestPayload) {
         logger.info("In updateCounter()");
         CounterResponsePayload response = counterService.updateCounter(counterCode, requestPayload);
         return ResponseEntity.ok()
                 .body(new ApiResponse(response, true, "Process Stage Updated Successfully with Code: " + response.getCounterNo()));
     }
 
-    @GetMapping(value ={"", ""}, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = {"", ""}, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<IApiResponse> getCounterList(
             @RequestParam(name = "org-code", required = false) String orgCode,
             @RequestParam(name = "dept-code", required = false) String deptCode,
             @RequestParam(name = "cat-code", required = false) String catCode,
             @RequestParam(name = "token_type-code", required = false) String tokenTypeCode) {
         logger.info("In getDepartmentList()");
-        List<CounterResponsePayload> response = counterService.getCounterList(orgCode, deptCode, catCode,tokenTypeCode);
+        List<CounterResponsePayload> response = counterService.getCounterList(orgCode, deptCode, catCode, tokenTypeCode);
         return ResponseEntity.ok()
                 .body(new ApiResponse(response, true, "Process Stage Details Fetched Successfully"));
     }
 
     @GetMapping(value = "/{counter-code}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<IApiResponse> getCounterDetails(@PathVariable(name="counter-code") String counterCode,
-                                                               @RequestParam(name = "org-code", required = false) String orgCode,
-                                                               @RequestParam(name = "dept-code", required = false) String deptCode,
-                                                               @RequestParam(name = "cat-code", required = false) String catCode,
-                                                               @RequestParam(name = "token_type-code", required = false) String tokenTypeCode) {
+    public ResponseEntity<IApiResponse> getCounterDetails(@PathVariable(name = "counter-code") String counterCode,
+                                                          @RequestParam(name = "org-code", required = false) String orgCode,
+                                                          @RequestParam(name = "dept-code", required = false) String deptCode,
+                                                          @RequestParam(name = "cat-code", required = false) String catCode,
+                                                          @RequestParam(name = "token_type-code", required = false) String tokenTypeCode) {
         logger.info("In getCounterDetails()");
         CounterResponsePayload response = counterService.getCounterDetails(orgCode, deptCode, catCode, tokenTypeCode, counterCode);
         return ResponseEntity.ok()

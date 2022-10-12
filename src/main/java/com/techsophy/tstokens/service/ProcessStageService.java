@@ -31,7 +31,7 @@ public class ProcessStageService {
     private static final String DELETED = "DELETED";
 
     @Autowired
-    public ProcessStageService(OrganizationRepository organizationRepository, DepartmentRepository departmentRepository, ValidationUtils validationUtils, TokenCategoryService tokenCategoryService, TokenTypeRepository tokenTypeRepository, ProcessStageRepository processStageRepository,TokenCategoryRepository tokenCategoryRepository) {
+    public ProcessStageService(OrganizationRepository organizationRepository, DepartmentRepository departmentRepository, ValidationUtils validationUtils, TokenCategoryService tokenCategoryService, TokenTypeRepository tokenTypeRepository, ProcessStageRepository processStageRepository, TokenCategoryRepository tokenCategoryRepository) {
         this.organizationRepository = organizationRepository;
         this.departmentRepository = departmentRepository;
         this.validationUtils = validationUtils;
@@ -45,32 +45,33 @@ public class ProcessStageService {
         logger.info("In getProcessStageDetails()");
         //TODO: Validation
         Optional<ProcessStage> processStageOpt = Optional.empty();
-        if(!StringUtils.isEmpty(orgCode)) {
-            if(!StringUtils.isEmpty(deptCode)) {
-                if(!StringUtils.isEmpty(catCode)) {
-                    if(!StringUtils.isEmpty(tokenTypeCode)) {
-                        processStageOpt = processStageRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCodeAndCode(orgCode, deptCode, catCode, tokenTypeCode,stageCode);
+        if (!StringUtils.isEmpty(orgCode)) {
+            if (!StringUtils.isEmpty(deptCode)) {
+                if (!StringUtils.isEmpty(catCode)) {
+                    if (!StringUtils.isEmpty(tokenTypeCode)) {
+                        processStageOpt = processStageRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCodeAndCode(orgCode, deptCode, catCode, tokenTypeCode, stageCode);
                     } else {
-                        processStageOpt = processStageRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCode(orgCode, deptCode, catCode,stageCode);
+                        processStageOpt = processStageRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCode(orgCode, deptCode, catCode, stageCode);
                     }
                 } else {
-                    processStageOpt = processStageRepository.findByOrganizationCodeAndDepartmentCodeAndCode(orgCode, deptCode,stageCode);
+                    processStageOpt = processStageRepository.findByOrganizationCodeAndDepartmentCodeAndCode(orgCode, deptCode, stageCode);
                 }
             } else {
-                processStageOpt = processStageRepository.findByOrganizationCodeAndCode(orgCode,stageCode);
+                processStageOpt = processStageRepository.findByOrganizationCodeAndCode(orgCode, stageCode);
             }
         } else {
             processStageOpt = processStageRepository.findByCode(stageCode);
         }
         ProcessStageResponsePayload response = null;
         ApplicationMapping<ProcessStageResponsePayload, ProcessStage> responseMapping = new ApplicationMapping<>();
-        if(processStageOpt.isPresent()) {
+        if (processStageOpt.isPresent()) {
             response = responseMapping.convert(processStageOpt.get(), ProcessStageResponsePayload.class);
         } else {
             throw new ResourceNotFoundException("TS908- Invalid input, supplied data does not exists");
         }
         return response;
     }
+
     public List<ProcessStageResponsePayload> getProcessStageList(String orgCode, String deptCode, String catCode, String tokenTypeCode) {
         logger.info("In getProcessStageDetails()");
         List<ProcessStage> processStageList;
@@ -102,6 +103,7 @@ public class ProcessStageService {
         }
         return response;
     }
+
     public ProcessStageResponsePayload createProcessStage(ProcessStageCreateRequestPayload requestPayload) {
         logger.info("In createProcessStage()");
 
@@ -111,42 +113,44 @@ public class ProcessStageService {
         ProcessStage processStage = mapping.convert(requestPayload, ProcessStage.class);
         return saveProcessStage(processStage);
     }
+
     public ProcessStageResponsePayload saveProcessStage(ProcessStage processStage) {
         logger.info("In saveProcessStage()");
         organizationRepository.findByCodeAndStatus(processStage.getOrganizationCode(), CREATED).orElseThrow(() -> new ResourceNotFoundException("Invalid Organization Code Provided"));
         departmentRepository.findByOrganizationCodeAndCodeAndStatus(processStage.getOrganizationCode(), processStage.getDepartmentCode(), CREATED).orElseThrow(() -> new ResourceNotFoundException("Invalid Department Code Provided"));
         tokenCategoryRepository.findByOrganizationCodeAndDepartmentCodeAndCodeAndStatus(processStage.getOrganizationCode(), processStage.getDepartmentCode(), processStage.getTokenCategoryCode(), CREATED).orElseThrow(() -> new ResourceNotFoundException("Invalid Category Code Provided"));
-        tokenTypeRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCodeAndStatus(processStage.getOrganizationCode(), processStage.getDepartmentCode(), processStage.getTokenCategoryCode(),processStage.getTokenTypeCode(), CREATED).orElseThrow(() -> new ResourceNotFoundException("Invalid Token Type Code Provided"));
+        tokenTypeRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCodeAndStatus(processStage.getOrganizationCode(), processStage.getDepartmentCode(), processStage.getTokenCategoryCode(), processStage.getTokenTypeCode(), CREATED).orElseThrow(() -> new ResourceNotFoundException("Invalid Token Type Code Provided"));
         processStage.setCreatedOn(new Date());
         processStage.setStatus(CREATED);
-        processStage.setCode(SecurityUtils.generateCode(processStage.getName(),4));
+        processStage.setCode(SecurityUtils.generateCode(processStage.getName(), 4));
         processStageRepository.save(processStage);
 
         ApplicationMapping<ProcessStageResponsePayload, ProcessStage> responseMapping = new ApplicationMapping<>();
         return responseMapping.convert(processStage, ProcessStageResponsePayload.class);
     }
+
     public ProcessStageResponsePayload updateProcessStage(String stageCode, ProcessStageUpdateRequestPayload requestPayload) {
         logger.info("In updateProcessStage()");
         Optional<ProcessStage> processStageOpt = Optional.empty();
-        if(!StringUtils.isEmpty(requestPayload.getOrganizationCode())) {
-            if(!StringUtils.isEmpty(requestPayload.getDepartmentCode())) {
-                if(!StringUtils.isEmpty(requestPayload.getTokenCategoryCode())) {
-                    if(!StringUtils.isEmpty(requestPayload.getTokenTypeCode())) {
+        if (!StringUtils.isEmpty(requestPayload.getOrganizationCode())) {
+            if (!StringUtils.isEmpty(requestPayload.getDepartmentCode())) {
+                if (!StringUtils.isEmpty(requestPayload.getTokenCategoryCode())) {
+                    if (!StringUtils.isEmpty(requestPayload.getTokenTypeCode())) {
                         processStageOpt = processStageRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCodeAndCode(requestPayload.getOrganizationCode(), requestPayload.getDepartmentCode(), requestPayload.getTokenCategoryCode(), requestPayload.getTokenTypeCode(), stageCode);
                     } else {
-                        processStageOpt = processStageRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCode(requestPayload.getOrganizationCode(), requestPayload.getDepartmentCode(), requestPayload.getTokenCategoryCode(),stageCode);
+                        processStageOpt = processStageRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCode(requestPayload.getOrganizationCode(), requestPayload.getDepartmentCode(), requestPayload.getTokenCategoryCode(), stageCode);
                     }
                 } else {
-                    processStageOpt = processStageRepository.findByOrganizationCodeAndDepartmentCodeAndCode(requestPayload.getOrganizationCode(), requestPayload.getDepartmentCode(),stageCode);
+                    processStageOpt = processStageRepository.findByOrganizationCodeAndDepartmentCodeAndCode(requestPayload.getOrganizationCode(), requestPayload.getDepartmentCode(), stageCode);
                 }
             } else {
-                processStageOpt = processStageRepository.findByOrganizationCodeAndCode(requestPayload.getOrganizationCode(),stageCode);
+                processStageOpt = processStageRepository.findByOrganizationCodeAndCode(requestPayload.getOrganizationCode(), stageCode);
             }
         } else {
             processStageOpt = processStageRepository.findByCode(stageCode);
         }
         ProcessStage processStage = new ProcessStage();
-        if(processStageOpt.isPresent()) {
+        if (processStageOpt.isPresent()) {
             processStage = processStageOpt.get();
             processStage.setStatus(requestPayload.getStatus());
         } else {
@@ -158,6 +162,7 @@ public class ProcessStageService {
         ApplicationMapping<ProcessStageResponsePayload, ProcessStage> responseMapping = new ApplicationMapping<>();
         return responseMapping.convert(processStage, ProcessStageResponsePayload.class);
     }
+
     public String deleteProcessStage(String stageId) {
         logger.info("In deleteProcessStage()");
         ProcessStage processStage = processStageRepository.findById(stageId).orElseThrow(

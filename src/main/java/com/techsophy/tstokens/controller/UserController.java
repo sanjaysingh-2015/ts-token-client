@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/users")
@@ -35,7 +36,7 @@ public class UserController {
     }
 
     @PutMapping(value = "/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<IApiResponse> updateUser(@PathVariable("email") String email,@RequestBody @Valid UserCreateRequestPayload requestPayload) {
+    public ResponseEntity<IApiResponse> updateUser(@PathVariable("email") String email, @RequestBody @Valid UserCreateRequestPayload requestPayload) {
         logger.info("In updateUser()");
         UserResponsePayload response = userConfigService.updateUser(email, requestPayload);
         return ResponseEntity.ok()

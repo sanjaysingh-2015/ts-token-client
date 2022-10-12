@@ -10,13 +10,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class AuthCodeUtils {
-  private static final Logger logger = LoggerFactory.getLogger(AuthCodeUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(AuthCodeUtils.class);
 
-  @Autowired
-  private OrganizationRepository organizationRepository;
-  public Organization validateAuthCode(String authToken) {
-      Organization organization = organizationRepository.findByAuthCode(authToken).orElseThrow(() ->
-              new AccessDeniedException("501: Invalid Auth Code for access client"));
-      return organization;
-  }
+    @Autowired
+    private OrganizationRepository organizationRepository;
+
+    public Organization validateAuthCode(String authToken) {
+        Organization organization = organizationRepository.findByAuthCode(authToken).orElseThrow(() ->
+                new AccessDeniedException("501: Invalid Auth Code for access client"));
+        return organization;
+    }
 }

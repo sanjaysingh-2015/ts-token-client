@@ -118,7 +118,7 @@ public class CounterProcessStageMappingService {
                     .orElseThrow(() -> new ResourceNotFoundException("Invalid Organization does not exists"));
             if (!StringUtils.isEmpty(request.getDepartmentCode())) {
                 departmentRepository.findByOrganizationCodeAndCodeAndStatus(
-                        request.getOrganizationCode(), request.getDepartmentCode(), CREATED)
+                                request.getOrganizationCode(), request.getDepartmentCode(), CREATED)
                         .orElseThrow(() -> new ResourceNotFoundException("Invalid Department does not exists"));
                 if (!StringUtils.isEmpty(request.getTokenCategoryCode())) {
                     tokenCategoryRepository.findByOrganizationCodeAndDepartmentCodeAndCodeAndStatus(
@@ -138,14 +138,14 @@ public class CounterProcessStageMappingService {
                         }
                         if (!StringUtils.isEmpty(request.getProcessStageCode())) {
                             processStage = processStageRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCodeAndCode(
-                                    request.getOrganizationCode(), request.getDepartmentCode(), request.getTokenCategoryCode(),
-                                    request.getTokenTypeCode(), request.getProcessStageCode())
+                                            request.getOrganizationCode(), request.getDepartmentCode(), request.getTokenCategoryCode(),
+                                            request.getTokenTypeCode(), request.getProcessStageCode())
                                     .orElseThrow(() -> new ResourceNotFoundException("Process Stage does not exists"));
                         }
                         List<CounterProcessMapping> processMappingList = counterProcessMappingRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCodeAndCounterIdAndProcessStageIdAndStatus(
                                 request.getOrganizationCode(), request.getDepartmentCode(), request.getTokenCategoryCode(),
                                 request.getTokenTypeCode(), counter.getId(), processStage.getId(), CREATED);
-                        if(!processMappingList.isEmpty()) {
+                        if (!processMappingList.isEmpty()) {
                             throw new InvalidOperationException("Active Mapping already exists");
                         }
                     } else {
@@ -164,7 +164,7 @@ public class CounterProcessStageMappingService {
                         List<CounterProcessMapping> processMappingList = counterProcessMappingRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCounterIdAndProcessStageIdAndStatus(
                                 request.getOrganizationCode(), request.getDepartmentCode(), request.getTokenCategoryCode(),
                                 counter.getId(), processStage.getId(), CREATED);
-                        if(!processMappingList.isEmpty()) {
+                        if (!processMappingList.isEmpty()) {
                             throw new InvalidOperationException("Active Mapping already exists");
                         }
                     }
@@ -184,7 +184,7 @@ public class CounterProcessStageMappingService {
                     List<CounterProcessMapping> processMappingList = counterProcessMappingRepository.findByOrganizationCodeAndDepartmentCodeAndCounterIdAndProcessStageIdAndStatus(
                             request.getOrganizationCode(), request.getDepartmentCode(),
                             counter.getId(), processStage.getId(), CREATED);
-                    if(!processMappingList.isEmpty()) {
+                    if (!processMappingList.isEmpty()) {
                         throw new InvalidOperationException("Active Mapping already exists");
                     }
                 }
@@ -204,7 +204,7 @@ public class CounterProcessStageMappingService {
                 List<CounterProcessMapping> processMappingList = counterProcessMappingRepository.findByOrganizationCodeAndCounterIdAndProcessStageIdAndStatus(
                         request.getOrganizationCode(),
                         counter.getId(), processStage.getId(), CREATED);
-                if(!processMappingList.isEmpty()) {
+                if (!processMappingList.isEmpty()) {
                     throw new InvalidOperationException("Active Mapping already exists");
                 }
             }
@@ -263,7 +263,7 @@ public class CounterProcessStageMappingService {
                         processMappingList = counterProcessMappingRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCodeAndCounterIdAndProcessStageIdAndStatus(
                                 request.getOrganizationCode(), request.getDepartmentCode(), request.getTokenCategoryCode(),
                                 request.getTokenTypeCode(), counter.getId(), processStage.getId(), CREATED);
-                        if(processMappingList.isEmpty()) {
+                        if (processMappingList.isEmpty()) {
                             throw new InvalidOperationException("Active Mapping already exists");
                         }
                     } else {
@@ -282,7 +282,7 @@ public class CounterProcessStageMappingService {
                         processMappingList = counterProcessMappingRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCounterIdAndProcessStageIdAndStatus(
                                 request.getOrganizationCode(), request.getDepartmentCode(), request.getTokenCategoryCode(),
                                 counter.getId(), processStage.getId(), CREATED);
-                        if(processMappingList.isEmpty()) {
+                        if (processMappingList.isEmpty()) {
                             throw new InvalidOperationException("Active Mapping already exists");
                         }
                     }
@@ -302,7 +302,7 @@ public class CounterProcessStageMappingService {
                     processMappingList = counterProcessMappingRepository.findByOrganizationCodeAndDepartmentCodeAndCounterIdAndProcessStageIdAndStatus(
                             request.getOrganizationCode(), request.getDepartmentCode(),
                             counter.getId(), processStage.getId(), CREATED);
-                    if(processMappingList.isEmpty()) {
+                    if (processMappingList.isEmpty()) {
                         throw new InvalidOperationException("Active Mapping already exists");
                     }
                 }
@@ -322,7 +322,7 @@ public class CounterProcessStageMappingService {
                 processMappingList = counterProcessMappingRepository.findByOrganizationCodeAndCounterIdAndProcessStageIdAndStatus(
                         request.getOrganizationCode(),
                         counter.getId(), processStage.getId(), CREATED);
-                if(processMappingList.isEmpty()) {
+                if (processMappingList.isEmpty()) {
                     throw new InvalidOperationException("Active Mapping already exists");
                 }
             }
