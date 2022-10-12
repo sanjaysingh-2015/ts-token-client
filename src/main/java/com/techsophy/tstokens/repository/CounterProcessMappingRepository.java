@@ -20,7 +20,7 @@ public interface CounterProcessMappingRepository extends MongoRepository<Counter
 
     List<CounterProcessMapping> findByOrganizationCodeAndDepartmentCodeAndCounterId(String orgCode, String deptCode, String counterId);
 
-    List<CounterProcessMapping> findByOrganizationCodeAndDepartmentCodeAAndTokenCategoryCodeAndCounterId(String orgCode, String deptCode, String catCode, String counterId);
+    List<CounterProcessMapping> findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCounterId(String orgCode, String deptCode, String catCode, String counterId);
 
     List<CounterProcessMapping> findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCodeAndCounterId(String orgCode, String deptCode, String catCode, String typeCode, String counterId);
 
