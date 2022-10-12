@@ -1,7 +1,6 @@
 package com.techsophy.tstokens.repository;
 
 import com.techsophy.tstokens.entity.CounterDeviceMapping;
-import com.techsophy.tstokens.entity.CounterProcessMapping;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

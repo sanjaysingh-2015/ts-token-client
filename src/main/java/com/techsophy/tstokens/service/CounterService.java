@@ -7,7 +7,6 @@ import com.techsophy.tstokens.entity.Counter;
 import com.techsophy.tstokens.exception.ResourceNotFoundException;
 import com.techsophy.tstokens.repository.*;
 import com.techsophy.tstokens.utils.ApplicationMapping;
-import com.techsophy.tstokens.utils.SecurityUtils;
 import com.techsophy.tstokens.utils.ValidationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

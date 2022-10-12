@@ -1,6 +1,5 @@
 package com.techsophy.tstokens.repository;
 
-import com.techsophy.tstokens.entity.Counter;
 import com.techsophy.tstokens.entity.Device;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
