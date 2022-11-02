@@ -24,8 +24,8 @@ user:
     redirectUris: http://localhost:8081/login
     user.username: sanjay@techsophy.com
     user.password: sanjay
-    accessTokenValidity: 1440000
-    refreshTokenValidity: 2000000
+    accessTokenValidity: 288000000
+    refreshTokenValidity: 288000000
     cookieName: token-cookie
 security:
   oauth2:

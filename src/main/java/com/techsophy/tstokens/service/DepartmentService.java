@@ -53,17 +53,17 @@ public class DepartmentService {
 
     public List<DepartmentResponsePayload> getDepartmentList(String orgCode) {
         logger.info("In getDepartmentList()");
-        List<Department> departmentList;
+        List<Department> departmentList = new ArrayList<>();
         if (!StringUtils.isEmpty(orgCode)) {
             departmentList = departmentRepository.findByOrganizationCode(orgCode);
-        } else {
-            departmentList = departmentRepository.findAll();
         }
         List<DepartmentResponsePayload> response = new ArrayList<>();
         ApplicationMapping<DepartmentResponsePayload, Department> responseMapping = new ApplicationMapping<>();
-        departmentList.forEach(department ->
-                response.add(responseMapping.convert(department, DepartmentResponsePayload.class))
-        );
+        if(departmentList != null) {
+            departmentList.forEach(department ->
+                    response.add(responseMapping.convert(department, DepartmentResponsePayload.class))
+            );
+        }
         return response;
     }
 

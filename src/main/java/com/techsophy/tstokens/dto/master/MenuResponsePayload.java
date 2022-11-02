@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -19,4 +21,5 @@ public class MenuResponsePayload {
     private String uiPageUrl;
     private Integer displayOrder;
     private String status;
+    private List<MenuResponsePayload> childMenu;
 }

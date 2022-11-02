@@ -23,7 +23,5 @@ public class CounterCreateRequestPayload {
     @Size(max = 10)
     private String code;
     @Size(max = 10)
-    private String name;
-    @Size(max = 10)
     private String counterNo;
 }

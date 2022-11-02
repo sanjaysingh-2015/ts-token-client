@@ -16,32 +16,32 @@ public interface CounterProcessMappingRepository extends MongoRepository<Counter
 
     List<CounterProcessMapping> findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCode(String orgCode, String deptCode, String catCode, String typeCode);
 
-    List<CounterProcessMapping> findByOrganizationCodeAndCounterId(String orgCode, String counterId);
+    List<CounterProcessMapping> findByOrganizationCodeAndCounterCode(String orgCode, String counterId);
 
-    List<CounterProcessMapping> findByOrganizationCodeAndDepartmentCodeAndCounterId(String orgCode, String deptCode, String counterId);
+    List<CounterProcessMapping> findByOrganizationCodeAndDepartmentCodeAndCounterCode(String orgCode, String deptCode, String counterId);
 
-    List<CounterProcessMapping> findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCounterId(String orgCode, String deptCode, String catCode, String counterId);
+    List<CounterProcessMapping> findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCounterCode(String orgCode, String deptCode, String catCode, String counterId);
 
-    List<CounterProcessMapping> findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCodeAndCounterId(String orgCode, String deptCode, String catCode, String typeCode, String counterId);
+    List<CounterProcessMapping> findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCodeAndCounterCode(String orgCode, String deptCode, String catCode, String typeCode, String counterId);
 
-    List<CounterProcessMapping> findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCodeAndCounterIdAndProcessStageId(String orgCode, String deptCode, String catCode, String tokenTypeCode, String counterId, String processStageId);
+    List<CounterProcessMapping> findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCodeAndCounterCodeAndProcessStageCode(String orgCode, String deptCode, String catCode, String tokenTypeCode, String counterId, String processStageId);
 
-    List<CounterProcessMapping> findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCounterIdAndProcessStageId(String orgCode, String deptCode, String catCode, String counterId, String processStageId);
+    List<CounterProcessMapping> findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCounterCodeAndProcessStageCode(String orgCode, String deptCode, String catCode, String counterId, String processStageId);
 
-    List<CounterProcessMapping> findByOrganizationCodeAndDepartmentCodeAndCounterIdAndProcessStageId(String orgCode, String deptCode, String counterId, String processStageId);
+    List<CounterProcessMapping> findByOrganizationCodeAndDepartmentCodeAndCounterCodeAndProcessStageCode(String orgCode, String deptCode, String counterId, String processStageId);
 
-    List<CounterProcessMapping> findByOrganizationCodeAndCounterIdAndProcessStageId(String orgCode, String counterId, String processStageId);
+    List<CounterProcessMapping> findByOrganizationCodeAndCounterCodeAndProcessStageCode(String orgCode, String counterId, String processStageId);
 
-    List<CounterProcessMapping> findByCounterId(String counterId);
+    List<CounterProcessMapping> findByCounterCode(String counterId);
+    List<CounterProcessMapping> findByCounterCodeAndStatus(String counterId, String status);
+    List<CounterProcessMapping> findByProcessStageCode(String processStageId);
 
-    List<CounterProcessMapping> findByProcessStageId(String processStageId);
+    List<CounterProcessMapping> findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCodeAndCounterCodeAndProcessStageCodeAndStatus(String orgCode, String deptCode, String catCode, String tokenTypeCode, String counterId, String processStageId, String status);
 
-    List<CounterProcessMapping> findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCodeAndCounterIdAndProcessStageIdAndStatus(String orgCode, String deptCode, String catCode, String tokenTypeCode, String counterId, String processStageId, String status);
+    List<CounterProcessMapping> findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCounterCodeAndProcessStageCodeAndStatus(String orgCode, String deptCode, String catCode, String counterId, String processStageId, String status);
 
-    List<CounterProcessMapping> findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCounterIdAndProcessStageIdAndStatus(String orgCode, String deptCode, String catCode, String counterId, String processStageId, String status);
+    List<CounterProcessMapping> findByOrganizationCodeAndDepartmentCodeAndCounterCodeAndProcessStageCodeAndStatus(String orgCode, String deptCode, String counterId, String processStageId, String status);
 
-    List<CounterProcessMapping> findByOrganizationCodeAndDepartmentCodeAndCounterIdAndProcessStageIdAndStatus(String orgCode, String deptCode, String counterId, String processStageId, String status);
-
-    List<CounterProcessMapping> findByOrganizationCodeAndCounterIdAndProcessStageIdAndStatus(String orgCode, String counterId, String processStageId, String status);
+    List<CounterProcessMapping> findByOrganizationCodeAndCounterCodeAndProcessStageCodeAndStatus(String orgCode, String counterId, String processStageId, String status);
 
 }

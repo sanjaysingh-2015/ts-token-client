@@ -24,7 +24,7 @@ public class MenuService {
 
     public List<MenuResponsePayload> getApplicationMenu() {
         logger.info("In getDepartmentDetails()");
-        List<Menu> menuList = menuRepository.findByStatus("ACTIVE");
+        List<Menu> menuList = menuRepository.findByStatusAndParentMenuCode("ACTIVE","");
         List<MenuResponsePayload> response = new ArrayList<>();
         ApplicationMapping<MenuResponsePayload, Menu> responseMapping = new ApplicationMapping<>();
         for (Menu menu : menuList) {

@@ -224,6 +224,16 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 .body(new ApiErrorsResponse(HttpStatus.UNPROCESSABLE_ENTITY, false, rx.getMessage()));
     }
 
+    @ExceptionHandler(value = ResourceNotFoundException.class)
+    public ResponseEntity<IApiResponse> handleResourceNotFoundException(ResourceNotFoundException rx, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).location(getLocation(request))
+                .body(new ApiErrorsResponse(HttpStatus.UNPROCESSABLE_ENTITY, false, rx.getMessage()));
+    }
+//    @ExceptionHandler({MethodArgumentNotValidException.class, HttpMessageNotReadableException.class})
+//    public ResponseEntity handleBindingErrors(Exception rx, HttpServletRequest request) {
+//        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).location(getLocation(request))
+//                .body(new ApiErrorsResponse(HttpStatus.UNPROCESSABLE_ENTITY, false, rx.getMessage()));
+//    }
     private URI getLocation(HttpServletRequest request) {
         Optional<Principal> principal = NullWrapper.resolve(request::getUserPrincipal);
         String userName = principal.isPresent() ? principal.get().getName() : "N/A";

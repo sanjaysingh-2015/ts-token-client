@@ -22,7 +22,7 @@ import java.util.List;
 @Validated
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
-@RequestMapping("/counter")
+@RequestMapping("/counters")
 public class CounterController {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final CounterService counterService;
@@ -53,7 +53,7 @@ public class CounterController {
             @RequestParam(name = "org-code", required = false) String orgCode,
             @RequestParam(name = "dept-code", required = false) String deptCode,
             @RequestParam(name = "cat-code", required = false) String catCode,
-            @RequestParam(name = "token_type-code", required = false) String tokenTypeCode) {
+            @RequestParam(name = "token-type-code", required = false) String tokenTypeCode) {
         logger.info("In getDepartmentList()");
         List<CounterResponsePayload> response = counterService.getCounterList(orgCode, deptCode, catCode, tokenTypeCode);
         return ResponseEntity.ok()
@@ -65,7 +65,7 @@ public class CounterController {
                                                           @RequestParam(name = "org-code", required = false) String orgCode,
                                                           @RequestParam(name = "dept-code", required = false) String deptCode,
                                                           @RequestParam(name = "cat-code", required = false) String catCode,
-                                                          @RequestParam(name = "token_type-code", required = false) String tokenTypeCode) {
+                                                          @RequestParam(name = "token-type-code", required = false) String tokenTypeCode) {
         logger.info("In getCounterDetails()");
         CounterResponsePayload response = counterService.getCounterDetails(orgCode, deptCode, catCode, tokenTypeCode, counterCode);
         return ResponseEntity.ok()

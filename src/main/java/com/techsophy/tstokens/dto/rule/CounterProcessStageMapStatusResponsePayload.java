@@ -6,19 +6,14 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.Size;
-
 @Setter
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProcessStageCreateRequestPayload {
+public class CounterProcessStageMapStatusResponsePayload {
+    private String id;
     @Size(max = 10)
-    private String organizationCode;
+    private String processStageCode;
     @Size(max = 10)
-    private String departmentCode;
-    @Size(max = 10)
-    private String tokenCategoryCode;
-    @Size(max = 10)
-    private String tokenTypeCode;
-    private String name;
+    private String status;
 }

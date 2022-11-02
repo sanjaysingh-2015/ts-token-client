@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.Size;
+import java.util.List;
 
 @Setter
 @Getter
@@ -22,6 +23,5 @@ public class CounterProcessStageMapCreateRequestPayload {
     private String tokenTypeCode;
     @Size(max = 10)
     private String counterCode;
-    @Size(max = 10)
-    private String processStageCode;
+    private List<String> processStage;
 }

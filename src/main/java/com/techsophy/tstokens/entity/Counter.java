@@ -30,8 +30,6 @@ public class Counter {
     private String tokenTypeCode;
     @Size(max = 10)
     private String code;
-    @Size(max = 10)
-    private String name;
     @NotNull
     private String counterNo;
     @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss")

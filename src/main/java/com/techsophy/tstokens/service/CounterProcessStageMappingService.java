@@ -45,7 +45,132 @@ public class CounterProcessStageMappingService {
 
     public List<ProcessStageResponsePayload> getProcessStageByCounterList(String orgCode, String deptCode, String catCode, String typeCode, String code) {
         List<ProcessStageResponsePayload> response = new ArrayList<>();
+        Counter counter = validateCounter(orgCode,deptCode,catCode,typeCode,code);
+        List<CounterProcessMapping> processTypeMap = counterProcessMappingRepository.findByCounterCode(counter.getId());
+        if (!processTypeMap.isEmpty()) {
+            processTypeMap.forEach(counterProcess -> {
+                Optional<ProcessStage> stageOpt = processStageRepository.findById(counterProcess.getProcessStageCode());
+                if (stageOpt.isPresent()) {
+                    ProcessStageResponsePayload item = new ProcessStageResponsePayload();
+                    item.setStatus(stageOpt.get().getStatus());
+                    item.setOrganizationCode(stageOpt.get().getOrganizationCode());
+                    item.setDepartmentCode(stageOpt.get().getDepartmentCode());
+                    item.setTokenCategoryCode(stageOpt.get().getTokenCategoryCode());
+                    item.setTokenTypeCode(stageOpt.get().getTokenTypeCode());
+                    item.setCode(stageOpt.get().getCode());
+                    item.setName(stageOpt.get().getName());
+                    item.setStatus(stageOpt.get().getStatus());
+                    response.add(item);
+                }
+            });
+        }
+        return response;
+    }
+
+    public List<CounterResponsePayload> getCounterByProcessStageList(String orgCode, String deptCode, String catCode, String typeCode, String stageCode) {
+        List<CounterResponsePayload> response = new ArrayList<>();
+        ProcessStage stage = validateStage(orgCode,deptCode,catCode,typeCode,stageCode);
+        List<CounterProcessMapping> processTypeMap = counterProcessMappingRepository.findByProcessStageCode(stage.getId());
+        if (!processTypeMap.isEmpty()) {
+            processTypeMap.forEach(counterProcess -> {
+                Optional<Counter> counterOpt = counterRepository.findById(counterProcess.getCounterCode());
+                if (counterOpt.isPresent()) {
+                    CounterResponsePayload item = new CounterResponsePayload();
+                    item.setOrganizationCode(counterOpt.get().getOrganizationCode());
+                    item.setDepartmentCode(counterOpt.get().getDepartmentCode());
+                    item.setTokenCategoryCode(counterOpt.get().getTokenCategoryCode());
+                    item.setTokenTypeCode(counterOpt.get().getTokenTypeCode());
+                    item.setCounterNo(counterOpt.get().getCounterNo());
+                    response.add(item);
+                }
+            });
+        }
+        return response;
+    }
+
+    public CounterProcessStageMapResponsePayload addProcessToCounterTree(CounterProcessStageMapCreateRequestPayload request) {
         Counter counter = null;
+        CounterProcessStageMapResponsePayload response = new CounterProcessStageMapResponsePayload();
+        List<CounterProcessMapping> counterProcessMappingList = validateAdd(request.getOrganizationCode(), request.getDepartmentCode(), request.getTokenCategoryCode(),
+                request.getTokenTypeCode(), request.getCounterCode(), request.getProcessStage());
+        if (!counterProcessMappingList.isEmpty()) {
+            throw new InvalidOperationException("An Active Mapping is already exists");
+        }
+
+        response.setOrganizationCode(request.getOrganizationCode());
+        response.setDepartmentCode(request.getDepartmentCode());
+        response.setTokenCategoryCode(request.getTokenCategoryCode());
+        response.setTokenTypeCode(request.getTokenTypeCode());
+        response.setCounterCode(request.getCounterCode());
+        List<CounterProcessStageMapStatusResponsePayload> stageList = new ArrayList<>();
+        for(String stageCode : request.getProcessStage()) {
+            CounterProcessMapping counterProcessMapping = new CounterProcessMapping(
+                    request.getOrganizationCode(), request.getDepartmentCode(), request.getTokenCategoryCode(),
+                    request.getTokenTypeCode(), request.getCounterCode(), stageCode, CREATED);
+            counterProcessMapping = counterProcessMappingRepository.save(counterProcessMapping);
+            CounterProcessStageMapStatusResponsePayload stage = new CounterProcessStageMapStatusResponsePayload(
+                    counterProcessMapping.getId(), stageCode, counterProcessMapping.getStatus());
+            stageList.add(stage);
+        }
+        response.setProcessStage(stageList);
+        return response;
+    }
+
+    public CounterProcessStageMapResponsePayload updateStatusProcessToCounterTree(CounterProcessStageMapUpdateRequestPayload request) {
+        Counter counter = null;
+        ProcessStage processStage = null;
+//        List<CounterProcessMapping> counterProcessMappingList = validateUpdate(request.getOrganizationCode(), request.getDepartmentCode(), request.getTokenCategoryCode(),
+//                request.getTokenTypeCode(), request.getCounterCode(), request.getProcessStage());
+//        if (!counterProcessMappingList.isEmpty()) {
+//            throw new InvalidOperationException("An Active Mapping is already exists");
+//        }
+        List<CounterProcessMapping> existingMapping = counterProcessMappingRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCodeAndCounterCode(
+                request.getOrganizationCode(), request.getDepartmentCode(), request.getTokenCategoryCode(),
+                request.getTokenTypeCode(), request.getCounterCode());
+        if (!existingMapping.isEmpty()) {
+            existingMapping.forEach(map -> {
+                map.setStatus(DELETED);
+                counterProcessMappingRepository.save(map);
+            });
+        }
+        List<CounterProcessStageMapStatusResponsePayload> stageList = new ArrayList<>();
+        if (!request.getProcessStage().isEmpty()) {
+            request.getProcessStage().forEach(stage -> {
+                Optional<CounterProcessMapping> exists = existingMapping.stream().filter(pStage -> pStage.getProcessStageCode().equalsIgnoreCase(stage)).findFirst();
+                if (exists.isPresent()) {
+                    exists.get().setStatus(CREATED);
+                    counterProcessMappingRepository.save(exists.get());
+                    CounterProcessStageMapStatusResponsePayload stageRes = new CounterProcessStageMapStatusResponsePayload(
+                            exists.get().getId(), stage, exists.get().getStatus());
+                    stageList.add(stageRes);
+                } else {
+                    CounterProcessMapping newMap = new CounterProcessMapping();
+                    newMap.setStatus(CREATED);
+                    newMap.setCounterCode(request.getCounterCode());
+                    newMap.setProcessStageCode(stage);
+                    newMap.setOrganizationCode(request.getOrganizationCode());
+                    newMap.setDepartmentCode(request.getDepartmentCode());
+                    newMap.setTokenCategoryCode(request.getTokenCategoryCode());
+                    newMap.setTokenTypeCode(request.getTokenTypeCode());
+                    counterProcessMappingRepository.save(newMap);
+                    CounterProcessStageMapStatusResponsePayload stageRes = new CounterProcessStageMapStatusResponsePayload(
+                            newMap.getId(), stage, newMap.getStatus());
+                    stageList.add(stageRes);
+                }
+            });
+        }
+        CounterProcessStageMapResponsePayload response = new CounterProcessStageMapResponsePayload();
+        response.setOrganizationCode(request.getOrganizationCode());
+        response.setDepartmentCode(request.getDepartmentCode());
+        response.setTokenCategoryCode(request.getTokenCategoryCode());
+        response.setTokenTypeCode(request.getTokenTypeCode());
+        response.setCounterCode(request.getCounterCode());
+        response.setProcessStage(stageList);
+        return response;
+    }
+
+    private Counter validateCounter(String orgCode, String deptCode, String catCode, String typeCode, String code) {
+        Counter counter;
         if (!StringUtils.isEmpty(orgCode)) {
             if (!StringUtils.isEmpty(deptCode)) {
                 if (!StringUtils.isEmpty(catCode)) {
@@ -67,280 +192,248 @@ public class CounterProcessStageMappingService {
         } else {
             throw new InvalidDataException("Invalid request");
         }
-        List<CounterProcessMapping> processTypeMap = counterProcessMappingRepository.findByCounterId(counter.getId());
-        if (!processTypeMap.isEmpty()) {
-            processTypeMap.forEach(counterProcess -> {
-                Optional<ProcessStage> stageOpt = processStageRepository.findById(counterProcess.getProcessStageId());
-                if (stageOpt.isPresent()) {
-                    ProcessStageResponsePayload item = new ProcessStageResponsePayload();
-                    item.setStatus(stageOpt.get().getStatus());
-                    item.setOrganizationCode(stageOpt.get().getOrganizationCode());
-                    item.setDepartmentCode(stageOpt.get().getDepartmentCode());
-                    item.setTokenCategoryCode(stageOpt.get().getTokenCategoryCode());
-                    item.setTokenTypeCode(stageOpt.get().getTokenTypeCode());
-                    item.setCode(stageOpt.get().getCode());
-                    item.setName(stageOpt.get().getName());
-                    item.setStatus(stageOpt.get().getStatus());
-                    response.add(item);
-                }
-            });
-        }
-        return response;
+        return counter;
     }
 
-    public List<CounterResponsePayload> getCounterByProcessStageList(String orgCode, String deptCode, String catCode, String typeCode, String stageCode) {
-        List<CounterResponsePayload> response = new ArrayList<>();
-        ProcessStage stage = processStageRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCodeAndCode(orgCode, deptCode, catCode, typeCode, stageCode)
-                .orElseThrow(() -> new ResourceNotFoundException("Counter does not exists"));
-        List<CounterProcessMapping> processTypeMap = counterProcessMappingRepository.findByProcessStageId(stage.getId());
-        if (!processTypeMap.isEmpty()) {
-            processTypeMap.forEach(counterProcess -> {
-                Optional<Counter> counterOpt = counterRepository.findById(counterProcess.getCounterId());
-                if (counterOpt.isPresent()) {
-                    CounterResponsePayload item = new CounterResponsePayload();
-                    item.setOrganizationCode(counterOpt.get().getOrganizationCode());
-                    item.setDepartmentCode(counterOpt.get().getDepartmentCode());
-                    item.setTokenCategoryCode(counterOpt.get().getTokenCategoryCode());
-                    item.setTokenTypeCode(counterOpt.get().getTokenTypeCode());
-                    item.setCounterNo(counterOpt.get().getCounterNo());
-                    response.add(item);
-                }
-            });
-        }
-        return response;
-    }
-
-    public CounterProcessStageMapResponsePayload addProcessToCounterTree(CounterProcessStageMapCreateRequestPayload request) {
-        Counter counter = null;
-        ProcessStage processStage = null;
-        if (!StringUtils.isEmpty(request.getOrganizationCode())) {
-            organizationRepository.findByCodeAndStatus(request.getOrganizationCode(), CREATED)
-                    .orElseThrow(() -> new ResourceNotFoundException("Invalid Organization does not exists"));
-            if (!StringUtils.isEmpty(request.getDepartmentCode())) {
-                departmentRepository.findByOrganizationCodeAndCodeAndStatus(
-                                request.getOrganizationCode(), request.getDepartmentCode(), CREATED)
-                        .orElseThrow(() -> new ResourceNotFoundException("Invalid Department does not exists"));
-                if (!StringUtils.isEmpty(request.getTokenCategoryCode())) {
-                    tokenCategoryRepository.findByOrganizationCodeAndDepartmentCodeAndCodeAndStatus(
-                                    request.getOrganizationCode(), request.getDepartmentCode(),
-                                    request.getTokenCategoryCode(), CREATED)
-                            .orElseThrow(() -> new ResourceNotFoundException("Invalid TOken Category does not exists"));
-                    if (!StringUtils.isEmpty(request.getTokenTypeCode())) {
-                        tokenTypeRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCodeAndStatus(
-                                        request.getOrganizationCode(), request.getDepartmentCode(),
-                                        request.getTokenCategoryCode(), request.getTokenTypeCode(), CREATED)
-                                .orElseThrow(() -> new ResourceNotFoundException("Invalid TOken Category does not exists"));
-                        if (!StringUtils.isEmpty(request.getCounterCode())) {
-                            counter = counterRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCodeAndCode(
-                                            request.getOrganizationCode(), request.getDepartmentCode(), request.getTokenCategoryCode(),
-                                            request.getTokenTypeCode(), request.getCounterCode())
-                                    .orElseThrow(() -> new ResourceNotFoundException("Process Stage does not exists"));
-                        }
-                        if (!StringUtils.isEmpty(request.getProcessStageCode())) {
-                            processStage = processStageRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCodeAndCode(
-                                            request.getOrganizationCode(), request.getDepartmentCode(), request.getTokenCategoryCode(),
-                                            request.getTokenTypeCode(), request.getProcessStageCode())
-                                    .orElseThrow(() -> new ResourceNotFoundException("Process Stage does not exists"));
-                        }
-                        List<CounterProcessMapping> processMappingList = counterProcessMappingRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCodeAndCounterIdAndProcessStageIdAndStatus(
-                                request.getOrganizationCode(), request.getDepartmentCode(), request.getTokenCategoryCode(),
-                                request.getTokenTypeCode(), counter.getId(), processStage.getId(), CREATED);
-                        if (!processMappingList.isEmpty()) {
-                            throw new InvalidOperationException("Active Mapping already exists");
-                        }
+    private ProcessStage validateStage(String orgCode, String deptCode, String catCode, String typeCode, String code) {
+        ProcessStage stage;
+        if (!StringUtils.isEmpty(orgCode)) {
+            if (!StringUtils.isEmpty(deptCode)) {
+                if (!StringUtils.isEmpty(catCode)) {
+                    if (!StringUtils.isEmpty(typeCode)) {
+                        stage = processStageRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCodeAndCode(orgCode, deptCode, catCode, typeCode, code)
+                                .orElseThrow(() -> new ResourceNotFoundException("Stage does not exists"));
                     } else {
-                        if (!StringUtils.isEmpty(request.getCounterCode())) {
-                            counter = counterRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCode(
-                                            request.getOrganizationCode(), request.getDepartmentCode(), request.getTokenCategoryCode(),
-                                            request.getCounterCode())
-                                    .orElseThrow(() -> new ResourceNotFoundException("Process Stage does not exists"));
-                        }
-                        if (!StringUtils.isEmpty(request.getProcessStageCode())) {
-                            processStage = processStageRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCode(
-                                            request.getOrganizationCode(), request.getDepartmentCode(), request.getTokenCategoryCode(),
-                                            request.getProcessStageCode())
-                                    .orElseThrow(() -> new ResourceNotFoundException("Process Stage does not exists"));
-                        }
-                        List<CounterProcessMapping> processMappingList = counterProcessMappingRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCounterIdAndProcessStageIdAndStatus(
-                                request.getOrganizationCode(), request.getDepartmentCode(), request.getTokenCategoryCode(),
-                                counter.getId(), processStage.getId(), CREATED);
-                        if (!processMappingList.isEmpty()) {
-                            throw new InvalidOperationException("Active Mapping already exists");
-                        }
+                        stage = processStageRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCode(orgCode, deptCode, catCode, code)
+                                .orElseThrow(() -> new ResourceNotFoundException("Stage does not exists"));
                     }
                 } else {
-                    if (!StringUtils.isEmpty(request.getCounterCode())) {
-                        counter = counterRepository.findByOrganizationCodeAndDepartmentCodeAndCode(
-                                        request.getOrganizationCode(), request.getDepartmentCode(),
-                                        request.getCounterCode())
-                                .orElseThrow(() -> new ResourceNotFoundException("Process Stage does not exists"));
-                    }
-                    if (!StringUtils.isEmpty(request.getProcessStageCode())) {
-                        processStage = processStageRepository.findByOrganizationCodeAndDepartmentCodeAndCode(
-                                        request.getOrganizationCode(), request.getDepartmentCode(),
-                                        request.getProcessStageCode())
-                                .orElseThrow(() -> new ResourceNotFoundException("Process Stage does not exists"));
-                    }
-                    List<CounterProcessMapping> processMappingList = counterProcessMappingRepository.findByOrganizationCodeAndDepartmentCodeAndCounterIdAndProcessStageIdAndStatus(
-                            request.getOrganizationCode(), request.getDepartmentCode(),
-                            counter.getId(), processStage.getId(), CREATED);
-                    if (!processMappingList.isEmpty()) {
-                        throw new InvalidOperationException("Active Mapping already exists");
-                    }
+                    stage = processStageRepository.findByOrganizationCodeAndDepartmentCodeAndCode(orgCode, deptCode, code)
+                            .orElseThrow(() -> new ResourceNotFoundException("Stage does not exists"));
                 }
             } else {
-                if (!StringUtils.isEmpty(request.getCounterCode())) {
-                    counter = counterRepository.findByOrganizationCodeAndCode(
-                                    request.getOrganizationCode(),
-                                    request.getCounterCode())
-                            .orElseThrow(() -> new ResourceNotFoundException("Process Stage does not exists"));
-                }
-                if (!StringUtils.isEmpty(request.getProcessStageCode())) {
-                    processStage = processStageRepository.findByOrganizationCodeAndCode(
-                                    request.getOrganizationCode(),
-                                    request.getProcessStageCode())
-                            .orElseThrow(() -> new ResourceNotFoundException("Process Stage does not exists"));
-                }
-                List<CounterProcessMapping> processMappingList = counterProcessMappingRepository.findByOrganizationCodeAndCounterIdAndProcessStageIdAndStatus(
-                        request.getOrganizationCode(),
-                        counter.getId(), processStage.getId(), CREATED);
-                if (!processMappingList.isEmpty()) {
-                    throw new InvalidOperationException("Active Mapping already exists");
-                }
+                stage = processStageRepository.findByOrganizationCodeAndCode(orgCode, code)
+                        .orElseThrow(() -> new ResourceNotFoundException("Stage does not exists"));
             }
         } else {
             throw new InvalidDataException("Invalid request");
         }
-        CounterProcessMapping counterProcessMapping = new CounterProcessMapping(
-                request.getOrganizationCode(), request.getDepartmentCode(), request.getTokenCategoryCode(),
-                request.getTokenTypeCode(), counter.getId(), processStage.getId(), CREATED);
-        counterProcessMapping = counterProcessMappingRepository.save(counterProcessMapping);
-
-        return new CounterProcessStageMapResponsePayload(
-                counterProcessMapping.getId(),
-                counterProcessMapping.getOrganizationCode(),
-                counterProcessMapping.getDepartmentCode(),
-                counterProcessMapping.getTokenCategoryCode(),
-                counterProcessMapping.getTokenTypeCode(),
-                counterProcessMapping.getCounterId(),
-                counterProcessMapping.getProcessStageId(),
-                counterProcessMapping.getStatus());
+        return stage;
     }
 
-    public CounterProcessStageMapResponsePayload updateStatusProcessToCounterTree(CounterProcessStageMapUpdateRequestPayload request) {
-        Counter counter = null;
-        ProcessStage processStage = null;
-        List<CounterProcessMapping> processMappingList = new ArrayList<>();
-        if (!StringUtils.isEmpty(request.getOrganizationCode())) {
-            organizationRepository.findByCodeAndStatus(request.getOrganizationCode(), CREATED)
+    private List<CounterProcessMapping> validateAdd(String orgCode, String deptCode, String catCode, String typeCode, String counterCode, List<String> stageCodeList) {
+        Counter counter = new Counter();
+        List<ProcessStage> processStageList = new ArrayList<>();
+        List<CounterProcessMapping> processMappingListFinal = new ArrayList<>();
+        if (!StringUtils.isEmpty(orgCode)) {
+            organizationRepository.findByCodeAndStatus(orgCode, CREATED)
                     .orElseThrow(() -> new ResourceNotFoundException("Invalid Organization does not exists"));
-            if (!StringUtils.isEmpty(request.getDepartmentCode())) {
+            if (!StringUtils.isEmpty(deptCode)) {
                 departmentRepository.findByOrganizationCodeAndCodeAndStatus(
-                                request.getOrganizationCode(), request.getDepartmentCode(), CREATED)
+                                orgCode, deptCode, CREATED)
                         .orElseThrow(() -> new ResourceNotFoundException("Invalid Department does not exists"));
-                if (!StringUtils.isEmpty(request.getTokenCategoryCode())) {
+                if (!StringUtils.isEmpty(catCode)) {
                     tokenCategoryRepository.findByOrganizationCodeAndDepartmentCodeAndCodeAndStatus(
-                                    request.getOrganizationCode(), request.getDepartmentCode(),
-                                    request.getTokenCategoryCode(), CREATED)
+                                    orgCode, deptCode, catCode, CREATED)
                             .orElseThrow(() -> new ResourceNotFoundException("Invalid TOken Category does not exists"));
-                    if (!StringUtils.isEmpty(request.getTokenTypeCode())) {
+                    if (!StringUtils.isEmpty(typeCode)) {
                         tokenTypeRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCodeAndStatus(
-                                        request.getOrganizationCode(), request.getDepartmentCode(),
-                                        request.getTokenCategoryCode(), request.getTokenTypeCode(), CREATED)
+                                        orgCode, deptCode,
+                                        catCode, typeCode, CREATED)
                                 .orElseThrow(() -> new ResourceNotFoundException("Invalid TOken Category does not exists"));
-                        if (!StringUtils.isEmpty(request.getCounterCode())) {
+                        if (!StringUtils.isEmpty(counterCode)) {
                             counter = counterRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCodeAndCode(
-                                            request.getOrganizationCode(), request.getDepartmentCode(), request.getTokenCategoryCode(),
-                                            request.getTokenTypeCode(), request.getCounterCode())
+                                            orgCode, deptCode,
+                                            catCode, typeCode, counterCode)
                                     .orElseThrow(() -> new ResourceNotFoundException("Process Stage does not exists"));
                         }
-                        if (!StringUtils.isEmpty(request.getProcessStageCode())) {
-                            processStage = processStageRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCodeAndCode(
-                                            request.getOrganizationCode(), request.getDepartmentCode(), request.getTokenCategoryCode(),
-                                            request.getTokenTypeCode(), request.getProcessStageCode())
-                                    .orElseThrow(() -> new ResourceNotFoundException("Process Stage does not exists"));
-                        }
-                        processMappingList = counterProcessMappingRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCodeAndCounterIdAndProcessStageIdAndStatus(
-                                request.getOrganizationCode(), request.getDepartmentCode(), request.getTokenCategoryCode(),
-                                request.getTokenTypeCode(), counter.getId(), processStage.getId(), CREATED);
-                        if (processMappingList.isEmpty()) {
-                            throw new InvalidOperationException("Active Mapping already exists");
+                        if (!stageCodeList.isEmpty()) {
+                            for(String stageCode: stageCodeList) {
+                                ProcessStage processStage = processStageRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCodeAndCode(
+                                                orgCode, deptCode,
+                                                catCode, typeCode, stageCode)
+                                        .orElseThrow(() -> new ResourceNotFoundException("Process Stage does not exists"));
+                                List<CounterProcessMapping> processMappingList = counterProcessMappingRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCodeAndCounterCodeAndProcessStageCodeAndStatus(
+                                        orgCode, deptCode,
+                                        catCode, typeCode, counter.getId(), processStage.getId(), CREATED);
+                                processMappingListFinal.addAll(processMappingList);
+                            }
+                        } else {
+                            throw new InvalidOperationException("Process Stage is not provided for mapping");
                         }
                     } else {
-                        if (!StringUtils.isEmpty(request.getCounterCode())) {
+                        if (!StringUtils.isEmpty(counterCode)) {
                             counter = counterRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCode(
-                                            request.getOrganizationCode(), request.getDepartmentCode(), request.getTokenCategoryCode(),
-                                            request.getCounterCode())
+                                            orgCode, deptCode,
+                                            catCode, counterCode)
                                     .orElseThrow(() -> new ResourceNotFoundException("Process Stage does not exists"));
                         }
-                        if (!StringUtils.isEmpty(request.getProcessStageCode())) {
-                            processStage = processStageRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCode(
-                                            request.getOrganizationCode(), request.getDepartmentCode(), request.getTokenCategoryCode(),
-                                            request.getProcessStageCode())
-                                    .orElseThrow(() -> new ResourceNotFoundException("Process Stage does not exists"));
-                        }
-                        processMappingList = counterProcessMappingRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCounterIdAndProcessStageIdAndStatus(
-                                request.getOrganizationCode(), request.getDepartmentCode(), request.getTokenCategoryCode(),
-                                counter.getId(), processStage.getId(), CREATED);
-                        if (processMappingList.isEmpty()) {
-                            throw new InvalidOperationException("Active Mapping already exists");
+                        if (!stageCodeList.isEmpty()) {
+                            for(String stageCode: stageCodeList) {
+                                ProcessStage processStage = processStageRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCode(
+                                                orgCode, deptCode,
+                                                catCode, stageCode)
+                                        .orElseThrow(() -> new ResourceNotFoundException("Process Stage does not exists"));
+                                List<CounterProcessMapping> processMappingList = counterProcessMappingRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCounterCodeAndProcessStageCodeAndStatus(
+                                        orgCode, deptCode,
+                                        catCode, counter.getId(), processStage.getId(), CREATED);
+                                processMappingListFinal.addAll(processMappingList);
+                            }
+                        } else {
+                            throw new InvalidOperationException("Process Stage is not provided for mapping");
                         }
                     }
                 } else {
-                    if (!StringUtils.isEmpty(request.getCounterCode())) {
+                    if (!StringUtils.isEmpty(counterCode)) {
                         counter = counterRepository.findByOrganizationCodeAndDepartmentCodeAndCode(
-                                        request.getOrganizationCode(), request.getDepartmentCode(),
-                                        request.getCounterCode())
+                                        orgCode, deptCode,
+                                        counterCode)
                                 .orElseThrow(() -> new ResourceNotFoundException("Process Stage does not exists"));
                     }
-                    if (!StringUtils.isEmpty(request.getProcessStageCode())) {
-                        processStage = processStageRepository.findByOrganizationCodeAndDepartmentCodeAndCode(
-                                        request.getOrganizationCode(), request.getDepartmentCode(),
-                                        request.getProcessStageCode())
-                                .orElseThrow(() -> new ResourceNotFoundException("Process Stage does not exists"));
-                    }
-                    processMappingList = counterProcessMappingRepository.findByOrganizationCodeAndDepartmentCodeAndCounterIdAndProcessStageIdAndStatus(
-                            request.getOrganizationCode(), request.getDepartmentCode(),
-                            counter.getId(), processStage.getId(), CREATED);
-                    if (processMappingList.isEmpty()) {
-                        throw new InvalidOperationException("Active Mapping already exists");
+                    if (!stageCodeList.isEmpty()) {
+                        for(String stageCode: stageCodeList) {
+                            ProcessStage processStage = processStageRepository.findByOrganizationCodeAndDepartmentCodeAndCode(
+                                            orgCode, deptCode, stageCode)
+                                    .orElseThrow(() -> new ResourceNotFoundException("Process Stage does not exists"));
+                            List<CounterProcessMapping> processMappingList = counterProcessMappingRepository.findByOrganizationCodeAndDepartmentCodeAndCounterCodeAndProcessStageCodeAndStatus(
+                                    orgCode, deptCode,
+                                    counter.getId(), processStage.getId(), CREATED);
+                            processMappingListFinal.addAll(processMappingList);
+                        }
+                    } else {
+                        throw new InvalidOperationException("Process Stage is not provided for mapping");
                     }
                 }
             } else {
-                if (!StringUtils.isEmpty(request.getCounterCode())) {
+                if (!StringUtils.isEmpty(counterCode)) {
                     counter = counterRepository.findByOrganizationCodeAndCode(
-                                    request.getOrganizationCode(),
-                                    request.getCounterCode())
+                                    orgCode, counterCode)
                             .orElseThrow(() -> new ResourceNotFoundException("Process Stage does not exists"));
                 }
-                if (!StringUtils.isEmpty(request.getProcessStageCode())) {
-                    processStage = processStageRepository.findByOrganizationCodeAndCode(
-                                    request.getOrganizationCode(),
-                                    request.getProcessStageCode())
-                            .orElseThrow(() -> new ResourceNotFoundException("Process Stage does not exists"));
-                }
-                processMappingList = counterProcessMappingRepository.findByOrganizationCodeAndCounterIdAndProcessStageIdAndStatus(
-                        request.getOrganizationCode(),
-                        counter.getId(), processStage.getId(), CREATED);
-                if (processMappingList.isEmpty()) {
-                    throw new InvalidOperationException("Active Mapping already exists");
+                if (!stageCodeList.isEmpty()) {
+                    for(String stageCode: stageCodeList) {
+                        ProcessStage processStage = processStageRepository.findByOrganizationCodeAndCode(
+                                        orgCode, stageCode)
+                                .orElseThrow(() -> new ResourceNotFoundException("Process Stage does not exists"));
+                        List<CounterProcessMapping> processMappingList = counterProcessMappingRepository.findByOrganizationCodeAndCounterCodeAndProcessStageCodeAndStatus(
+                                orgCode,
+                                counter.getId(), processStage.getId(), CREATED);
+                        processMappingListFinal.addAll(processMappingList);
+                    }
+                } else {
+                    throw new InvalidOperationException("Process Stage is not provided for mapping");
                 }
             }
-        } else {
-            throw new InvalidDataException("Invalid request");
         }
-        CounterProcessMapping counterProcessMapping = processMappingList.get(0);
-        counterProcessMapping.setStatus(request.getStatus());
-        counterProcessMapping = counterProcessMappingRepository.save(counterProcessMapping);
 
-        return new CounterProcessStageMapResponsePayload(
-                counterProcessMapping.getId(),
-                counterProcessMapping.getOrganizationCode(),
-                counterProcessMapping.getDepartmentCode(),
-                counterProcessMapping.getTokenCategoryCode(),
-                counterProcessMapping.getTokenTypeCode(),
-                counterProcessMapping.getCounterId(),
-                counterProcessMapping.getProcessStageId(),
-                counterProcessMapping.getStatus());
+        return processMappingListFinal;
+    }
+
+    private List<CounterProcessMapping> validateUpdate(String orgCode, String deptCode, String catCode, String typeCode, String counterCode, List<String> stageCodeList) {
+        Counter counter = new Counter();
+        List<ProcessStage> processStageList = new ArrayList<>();
+        List<CounterProcessMapping> processMappingListFinal = new ArrayList<>();
+        if (!StringUtils.isEmpty(orgCode)) {
+            organizationRepository.findByCodeAndStatus(orgCode, CREATED)
+                    .orElseThrow(() -> new ResourceNotFoundException("Invalid Organization does not exists"));
+            if (!StringUtils.isEmpty(deptCode)) {
+                departmentRepository.findByOrganizationCodeAndCodeAndStatus(
+                                orgCode, deptCode, CREATED)
+                        .orElseThrow(() -> new ResourceNotFoundException("Invalid Department does not exists"));
+                if (!StringUtils.isEmpty(catCode)) {
+                    tokenCategoryRepository.findByOrganizationCodeAndDepartmentCodeAndCodeAndStatus(
+                                    orgCode, deptCode, catCode, CREATED)
+                            .orElseThrow(() -> new ResourceNotFoundException("Invalid TOken Category does not exists"));
+                    if (!StringUtils.isEmpty(typeCode)) {
+                        tokenTypeRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCodeAndStatus(
+                                        orgCode, deptCode,
+                                        catCode, typeCode, CREATED)
+                                .orElseThrow(() -> new ResourceNotFoundException("Invalid TOken Category does not exists"));
+                        if (!StringUtils.isEmpty(counterCode)) {
+                            counter = counterRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCodeAndCode(
+                                            orgCode, deptCode,
+                                            catCode, typeCode, counterCode)
+                                    .orElseThrow(() -> new ResourceNotFoundException("Process Stage does not exists"));
+                        }
+                        if (!stageCodeList.isEmpty()) {
+                            for(String stageRequest: stageCodeList) {
+                                ProcessStage processStage = processStageRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCodeAndCode(
+                                                orgCode, deptCode,
+                                                catCode, typeCode, stageRequest)
+                                        .orElseThrow(() -> new ResourceNotFoundException("Process Stage does not exists"));
+                                List<CounterProcessMapping> processMappingList = counterProcessMappingRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCodeAndCounterCodeAndProcessStageCodeAndStatus(
+                                        orgCode, deptCode,
+                                        catCode, typeCode, counter.getId(), processStage.getId(), CREATED);
+                                processMappingListFinal.addAll(processMappingList);
+                            }
+                        } else {
+                            throw new InvalidOperationException("Process Stage is not provided for mapping");
+                        }
+                    } else {
+                        if (!StringUtils.isEmpty(counterCode)) {
+                            counter = counterRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCode(
+                                            orgCode, deptCode,
+                                            catCode, counterCode)
+                                    .orElseThrow(() -> new ResourceNotFoundException("Process Stage does not exists"));
+                        }
+                        if (!stageCodeList.isEmpty()) {
+                            for(String stageRequest: stageCodeList) {
+                                ProcessStage processStage = processStageRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCode(
+                                                orgCode, deptCode,
+                                                catCode, stageRequest)
+                                        .orElseThrow(() -> new ResourceNotFoundException("Process Stage does not exists"));
+                                List<CounterProcessMapping> processMappingList = counterProcessMappingRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCounterCodeAndProcessStageCodeAndStatus(
+                                        orgCode, deptCode,
+                                        catCode, counter.getId(), processStage.getId(), CREATED);
+                                processMappingListFinal.addAll(processMappingList);
+                            }
+                        } else {
+                            throw new InvalidOperationException("Process Stage is not provided for mapping");
+                        }
+                    }
+                } else {
+                    if (!StringUtils.isEmpty(counterCode)) {
+                        counter = counterRepository.findByOrganizationCodeAndDepartmentCodeAndCode(
+                                        orgCode, deptCode,
+                                        counterCode)
+                                .orElseThrow(() -> new ResourceNotFoundException("Process Stage does not exists"));
+                    }
+                    if (!stageCodeList.isEmpty()) {
+                        for(String stageRequest: stageCodeList) {
+                            ProcessStage processStage = processStageRepository.findByOrganizationCodeAndDepartmentCodeAndCode(
+                                            orgCode, deptCode, stageRequest)
+                                    .orElseThrow(() -> new ResourceNotFoundException("Process Stage does not exists"));
+                            List<CounterProcessMapping> processMappingList = counterProcessMappingRepository.findByOrganizationCodeAndDepartmentCodeAndCounterCodeAndProcessStageCodeAndStatus(
+                                    orgCode, deptCode,
+                                    counter.getId(), processStage.getId(), CREATED);
+                            processMappingListFinal.addAll(processMappingList);
+                        }
+                    } else {
+                        throw new InvalidOperationException("Process Stage is not provided for mapping");
+                    }
+                }
+            } else {
+                if (!StringUtils.isEmpty(counterCode)) {
+                    counter = counterRepository.findByOrganizationCodeAndCode(
+                                    orgCode, counterCode)
+                            .orElseThrow(() -> new ResourceNotFoundException("Process Stage does not exists"));
+                }
+                if (!stageCodeList.isEmpty()) {
+                    for(String stageRequest: stageCodeList) {
+                        ProcessStage processStage = processStageRepository.findByOrganizationCodeAndCode(
+                                        orgCode, stageRequest)
+                                .orElseThrow(() -> new ResourceNotFoundException("Process Stage does not exists"));
+                        List<CounterProcessMapping> processMappingList = counterProcessMappingRepository.findByOrganizationCodeAndCounterCodeAndProcessStageCodeAndStatus(
+                                orgCode,
+                                counter.getId(), processStage.getId(), CREATED);
+                        processMappingListFinal.addAll(processMappingList);
+                    }
+                } else {
+                    throw new InvalidOperationException("Process Stage is not provided for mapping");
+                }
+            }
+        }
+
+        return processMappingListFinal;
     }
 }

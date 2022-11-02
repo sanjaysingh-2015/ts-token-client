@@ -76,19 +76,7 @@ public class ProcessStageService {
         logger.info("In getProcessStageDetails()");
         List<ProcessStage> processStageList;
         if (!StringUtils.isEmpty(orgCode)) {
-            if (!StringUtils.isEmpty(deptCode)) {
-                if (!StringUtils.isEmpty(catCode)) {
-                    if (!StringUtils.isEmpty(tokenTypeCode)) {
-                        processStageList = processStageRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCode(orgCode, deptCode, catCode, tokenTypeCode);
-                    } else {
-                        processStageList = processStageRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCode(orgCode, deptCode, catCode);
-                    }
-                } else {
-                    processStageList = processStageRepository.findByOrganizationCodeAndDepartmentCode(orgCode, deptCode);
-                }
-            } else {
-                processStageList = processStageRepository.findByOrganizationCode(orgCode);
-            }
+            processStageList = processStageRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCode(orgCode, deptCode, catCode, tokenTypeCode);
         } else {
             processStageList = processStageRepository.findAll();
         }
@@ -98,8 +86,6 @@ public class ProcessStageService {
             processStageList.forEach(processStage ->
                     response.add(responseMapping.convert(processStage, ProcessStageResponsePayload.class))
             );
-        } else {
-            throw new ResourceNotFoundException("TS908- Invalid input, supplied data does not exists");
         }
         return response;
     }
@@ -117,9 +103,15 @@ public class ProcessStageService {
     public ProcessStageResponsePayload saveProcessStage(ProcessStage processStage) {
         logger.info("In saveProcessStage()");
         organizationRepository.findByCodeAndStatus(processStage.getOrganizationCode(), CREATED).orElseThrow(() -> new ResourceNotFoundException("Invalid Organization Code Provided"));
-        departmentRepository.findByOrganizationCodeAndCodeAndStatus(processStage.getOrganizationCode(), processStage.getDepartmentCode(), CREATED).orElseThrow(() -> new ResourceNotFoundException("Invalid Department Code Provided"));
-        tokenCategoryRepository.findByOrganizationCodeAndDepartmentCodeAndCodeAndStatus(processStage.getOrganizationCode(), processStage.getDepartmentCode(), processStage.getTokenCategoryCode(), CREATED).orElseThrow(() -> new ResourceNotFoundException("Invalid Category Code Provided"));
-        tokenTypeRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCodeAndStatus(processStage.getOrganizationCode(), processStage.getDepartmentCode(), processStage.getTokenCategoryCode(), processStage.getTokenTypeCode(), CREATED).orElseThrow(() -> new ResourceNotFoundException("Invalid Token Type Code Provided"));
+        if(processStage.getDepartmentCode() != null && !StringUtils.isEmpty(processStage.getDepartmentCode())) {
+            departmentRepository.findByOrganizationCodeAndCodeAndStatus(processStage.getOrganizationCode(), processStage.getDepartmentCode(), CREATED).orElseThrow(() -> new ResourceNotFoundException("Invalid Department Code Provided"));
+        }
+        if(processStage.getTokenCategoryCode() != null && !StringUtils.isEmpty(processStage.getTokenCategoryCode())) {
+            tokenCategoryRepository.findByOrganizationCodeAndDepartmentCodeAndCodeAndStatus(processStage.getOrganizationCode(), processStage.getDepartmentCode(), processStage.getTokenCategoryCode(), CREATED).orElseThrow(() -> new ResourceNotFoundException("Invalid Category Code Provided"));
+        }
+        if(processStage.getTokenTypeCode() != null && !StringUtils.isEmpty(processStage.getTokenTypeCode())) {
+            tokenTypeRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCodeAndStatus(processStage.getOrganizationCode(), processStage.getDepartmentCode(), processStage.getTokenCategoryCode(), processStage.getTokenTypeCode(), CREATED).orElseThrow(() -> new ResourceNotFoundException("Invalid Token Type Code Provided"));
+        }
         processStage.setCreatedOn(new Date());
         processStage.setStatus(CREATED);
         processStage.setCode(SecurityUtils.generateCode(processStage.getName(), 4));
@@ -170,5 +162,23 @@ public class ProcessStageService {
         processStage.setStatus(DELETED);
         processStageRepository.save(processStage);
         return "Process Stage Deleted successfully";
+    }
+
+    public List<ProcessStageResponsePayload> getProcessStageListForMapping(String orgCode, String deptCode, String catCode, String tokenTypeCode) {
+        logger.info("In getProcessStageDetails()");
+        List<ProcessStage> processStageList = new ArrayList<>();
+        if (!StringUtils.isEmpty(orgCode)) {
+            processStageList = processStageRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndTokenTypeCode(orgCode, deptCode, catCode, tokenTypeCode);
+        } else {
+            throw new ResourceNotFoundException("TS908- Invalid input, supplied data does not exists");
+        }
+        List<ProcessStageResponsePayload> response = new ArrayList<>();
+        ApplicationMapping<ProcessStageResponsePayload, ProcessStage> responseMapping = new ApplicationMapping<>();
+        if (!processStageList.isEmpty()) {
+            processStageList.forEach(processStage ->
+                    response.add(responseMapping.convert(processStage, ProcessStageResponsePayload.class))
+            );
+        }
+        return response;
     }
 }

@@ -27,19 +27,21 @@ public class CounterProcessMapping {
     @Size(max = 10)
     private String tokenTypeCode;
     @NotNull
-    private String counterId;
+    @Size(max = 10)
+    private String counterCode;
     @NotNull
-    private String processStageId;
+    @Size(max = 10)
+    private String processStageCode;
     @Size(max = 10)
     private String status;
 
-    public CounterProcessMapping(String organizationCode, String departmentCode, String tokenCategoryCode, String tokenTypeCode, String counterId, String processStageId, String status) {
+    public CounterProcessMapping(String organizationCode, String departmentCode, String tokenCategoryCode, String tokenTypeCode, String counterCode, String processStageCode, String status) {
         this.organizationCode = organizationCode;
         this.departmentCode = departmentCode;
         this.tokenCategoryCode = tokenCategoryCode;
         this.tokenTypeCode = tokenTypeCode;
-        this.counterId = counterId;
-        this.processStageId = processStageId;
+        this.counterCode = counterCode;
+        this.processStageCode = processStageCode;
         this.status = status;
     }
 }

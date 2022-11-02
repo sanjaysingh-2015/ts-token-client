@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Setter
 @Getter
 @AllArgsConstructor
@@ -16,7 +18,7 @@ public class CounterResponsePayload {
     private String tokenCategoryCode;
     private String tokenTypeCode;
     private String code;
-    private String name;
     private String counterNo;
     private String status;
+    private List<ProcessStageResponsePayload> mappedProcessStages;
 }
