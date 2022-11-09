@@ -97,8 +97,6 @@ public class DeviceService {
             deviceList.forEach(device ->
                     response.add(responseMapping.convert(device, DeviceResponsePayload.class))
             );
-        } else {
-            throw new ResourceNotFoundException("TS908- Invalid input, supplied data does not exists");
         }
         return response;
     }
@@ -116,9 +114,15 @@ public class DeviceService {
     public DeviceResponsePayload saveDevice(Device device) {
         logger.info("In saveDevice()");
         organizationRepository.findByCodeAndStatus(device.getOrganizationCode(), CREATED).orElseThrow(() -> new ResourceNotFoundException("Invalid Organization Code Provided"));
-        departmentRepository.findByOrganizationCodeAndCodeAndStatus(device.getOrganizationCode(), device.getDepartmentCode(), CREATED).orElseThrow(() -> new ResourceNotFoundException("Invalid Department Code Provided"));
-        tokenCategoryRepository.findByOrganizationCodeAndDepartmentCodeAndCodeAndStatus(device.getOrganizationCode(), device.getDepartmentCode(), device.getTokenCategoryCode(), CREATED).orElseThrow(() -> new ResourceNotFoundException("Invalid Category Code Provided"));
-        tokenTypeRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCodeAndStatus(device.getOrganizationCode(), device.getDepartmentCode(), device.getTokenCategoryCode(), device.getTokenTypeCode(), CREATED).orElseThrow(() -> new ResourceNotFoundException("Invalid Token Type Code Provided"));
+        if(!StringUtils.isEmpty(device.getDepartmentCode())) {
+            departmentRepository.findByOrganizationCodeAndCodeAndStatus(device.getOrganizationCode(), device.getDepartmentCode(), CREATED).orElseThrow(() -> new ResourceNotFoundException("Invalid Department Code Provided"));
+        }
+        if(!StringUtils.isEmpty(device.getTokenCategoryCode())) {
+            tokenCategoryRepository.findByOrganizationCodeAndDepartmentCodeAndCodeAndStatus(device.getOrganizationCode(), device.getDepartmentCode(), device.getTokenCategoryCode(), CREATED).orElseThrow(() -> new ResourceNotFoundException("Invalid Category Code Provided"));
+        }
+        if(!StringUtils.isEmpty(device.getTokenTypeCode())) {
+            tokenTypeRepository.findByOrganizationCodeAndDepartmentCodeAndTokenCategoryCodeAndCodeAndStatus(device.getOrganizationCode(), device.getDepartmentCode(), device.getTokenCategoryCode(), device.getTokenTypeCode(), CREATED).orElseThrow(() -> new ResourceNotFoundException("Invalid Token Type Code Provided"));
+        }
         device.setCreatedOn(new Date());
         device.setStatus(CREATED);
         deviceRepository.save(device);

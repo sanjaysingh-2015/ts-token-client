@@ -27,7 +27,18 @@ public class CounterDeviceMapping {
     @Size(max = 10)
     private String tokenTypeCode;
     @NotNull
-    private String counterId;
+    private String counterCode;
     @NotNull
-    private String deviceId;
+    private String deviceUid;
+    private String status;
+
+    public CounterDeviceMapping(String organizationCode, String departmentCode, String tokenCategoryCode, String tokenTypeCode, String counterCode, String deviceUid, String status) {
+        this.organizationCode = organizationCode;
+        this.departmentCode = departmentCode;
+        this.tokenCategoryCode = tokenCategoryCode;
+        this.tokenTypeCode = tokenTypeCode;
+        this.counterCode = counterCode;
+        this.deviceUid = deviceUid;
+        this.status = status;
+    }
 }

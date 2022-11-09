@@ -22,7 +22,7 @@ import java.util.List;
 @Validated
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
-@RequestMapping("/device")
+@RequestMapping("/devices")
 public class DeviceController {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final DeviceService deviceService;

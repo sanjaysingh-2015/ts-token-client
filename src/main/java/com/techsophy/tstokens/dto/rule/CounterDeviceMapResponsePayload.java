@@ -11,15 +11,11 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CounterResponsePayload {
-    private String id;
+public class CounterDeviceMapResponsePayload {
     private String organizationCode;
     private String departmentCode;
     private String tokenCategoryCode;
     private String tokenTypeCode;
-    private String code;
-    private String counterNo;
-    private String status;
-    private List<ProcessStageResponsePayload> mappedProcessStages;
-    private List<DeviceResponsePayload> mappedDevices;
+    private String counterCode;
+    private List<CounterDeviceMapStatusResponsePayload> devices;
 }

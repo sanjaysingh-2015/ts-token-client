@@ -16,6 +16,7 @@ public class DeviceResponsePayload {
     private String tokenCategoryCode;
     private String tokenTypeCode;
     private String deviceUid;
+    private String deviceName;
     private String ipAddress;
     private String port;
     private String deviceType;
